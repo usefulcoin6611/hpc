@@ -40,6 +40,8 @@ export function useUser(): UseUserReturn {
         console.log('useUser: No token found, setting user to null')
         setUser(null)
         setError(null)
+        setIsLoading(false)
+        isFetchingRef.current = false
         return
       }
 
@@ -107,6 +109,18 @@ export function useUser(): UseUserReturn {
       if (e.key === 'token' || e.key === null) {
         // Token changed or was removed, refetch user data
         console.log('useUser: Storage change detected, refetching user')
+        
+        // Check if token still exists before refetching
+        const token = getStoredToken()
+        if (!token) {
+          console.log('useUser: No token found during storage change, setting user to null')
+          setUser(null)
+          setError(null)
+          setIsLoading(false)
+          isFetchingRef.current = false
+          return
+        }
+        
         if (fetchUserRef.current) {
           fetchUserRef.current(true)
         }
@@ -116,6 +130,18 @@ export function useUser(): UseUserReturn {
     const handleTokenChange = () => {
       // Custom event for token changes in same tab
       console.log('useUser: Token change event detected, refetching user')
+      
+      // Check if token still exists before refetching
+      const token = getStoredToken()
+      if (!token) {
+        console.log('useUser: No token found during token change, setting user to null')
+        setUser(null)
+        setError(null)
+        setIsLoading(false)
+        isFetchingRef.current = false
+        return
+      }
+      
       if (fetchUserRef.current) {
         fetchUserRef.current(true)
       }

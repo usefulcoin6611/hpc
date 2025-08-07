@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { getStoredToken } from "@/lib/auth-utils"
 import { userService, User, CreateUserData, UpdateUserData } from "@/services/user"
 
 export function useUsers() {
@@ -23,6 +24,23 @@ export function useUsers() {
   }) => {
     setLoading(true)
     try {
+      // Check if user is authenticated before making API call
+      const token = getStoredToken()
+      if (!token) {
+        console.log('useUsers: No token found, skipping API call')
+        setUsers([])
+        setPagination({
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false
+        })
+        setLoading(false)
+        return
+      }
+      
       const response = await userService.getAll(params)
       
       if (response.success) {
@@ -78,6 +96,17 @@ export function useUsers() {
 
   const createUser = async (data: CreateUserData): Promise<boolean> => {
     try {
+      // Check if user is authenticated before making API call
+      const token = getStoredToken()
+      if (!token) {
+        toast({
+          title: "Error",
+          description: "Sesi Anda telah berakhir. Silakan login kembali.",
+          variant: "destructive"
+        })
+        return false
+      }
+      
       const response = await userService.create(data)
       if (response.success) {
         toast({
@@ -107,6 +136,17 @@ export function useUsers() {
 
   const updateUser = async (id: number, data: UpdateUserData): Promise<boolean> => {
     try {
+      // Check if user is authenticated before making API call
+      const token = getStoredToken()
+      if (!token) {
+        toast({
+          title: "Error",
+          description: "Sesi Anda telah berakhir. Silakan login kembali.",
+          variant: "destructive"
+        })
+        return false
+      }
+      
       const response = await userService.update(id, data)
       if (response.success) {
         toast({
@@ -136,6 +176,17 @@ export function useUsers() {
 
   const deleteUser = async (id: number): Promise<boolean> => {
     try {
+      // Check if user is authenticated before making API call
+      const token = getStoredToken()
+      if (!token) {
+        toast({
+          title: "Error",
+          description: "Sesi Anda telah berakhir. Silakan login kembali.",
+          variant: "destructive"
+        })
+        return false
+      }
+      
       const response = await userService.delete(id)
       if (response.success) {
         toast({
@@ -165,7 +216,11 @@ export function useUsers() {
 
   // Load data on mount
   useEffect(() => {
-    fetchUsers()
+    // Only fetch users if user is authenticated
+    const token = getStoredToken()
+    if (token) {
+      fetchUsers()
+    }
   }, [])
 
   return {

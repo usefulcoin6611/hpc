@@ -104,17 +104,22 @@ export function EditUserDialog({ isOpen, onClose, onSubmit, user }: EditUserDial
     }
   }
 
-  if (!user) return null
-
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Edit Pengguna</DialogTitle>
-          <DialogDescription>
-            Edit informasi pengguna: {user.name} (@{user.username})
-          </DialogDescription>
-        </DialogHeader>
+        {!user ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="ml-2 text-gray-600">Memuat data pengguna...</span>
+          </div>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle>Edit Pengguna</DialogTitle>
+              <DialogDescription>
+                Edit informasi pengguna: {user.name} (@{user.username})
+              </DialogDescription>
+            </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* User Info (Read-only) */}
@@ -219,6 +224,8 @@ export function EditUserDialog({ isOpen, onClose, onSubmit, user }: EditUserDial
             </Button>
           </DialogFooter>
         </form>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )

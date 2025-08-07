@@ -3,10 +3,10 @@ import { hasPermission } from '@/lib/auth-utils'
 import type { UserRole, UserJobType } from '@/types'
 
 export function usePermission() {
-  const { user } = useUser()
+  const { user, isLoading } = useUser()
 
   const checkPermission = (allowedRoles?: UserRole[], allowedJobTypes?: UserJobType[]): boolean => {
-    if (!user) return false
+    if (!user || isLoading) return false
     
     return hasPermission(
       user.role, 
@@ -28,11 +28,12 @@ export function usePermission() {
   const canAccessBarangKeluar = checkPermission(undefined, ['admin', 'supervisor'])
   const canAccessUpdateLembarKerja = checkPermission(undefined, ['admin', 'supervisor', 'staff'])
   const canAccessLaporan = checkPermission(undefined, ['admin', 'supervisor'])
-  const canAccessDataPengguna = checkPermission(undefined, ['admin'])
+  const canAccessDataPengguna = checkPermission(['admin'], ['admin']) || checkPermission(undefined, ['admin'])
   const canAccessPengaturan = checkPermission(undefined, ['admin'])
 
   return {
     user,
+    isLoading,
     checkPermission,
     isAdmin,
     isSupervisor,

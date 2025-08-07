@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -11,6 +11,8 @@ import { usePermission } from "@/hooks/use-permission"
 import { AccessDenied } from "@/components/access-denied"
 import { EditUserDialog } from "@/components/dialogs/EditUserDialog"
 import { DeleteUserDialog } from "@/components/dialogs/DeleteUserDialog"
+import { ErrorBoundary } from "@/components/error-boundary"
+import { getStoredToken } from "@/lib/auth-utils"
 
 export default function DataPenggunaPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -18,22 +20,44 @@ export default function DataPenggunaPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   // Hook untuk data pengguna
   const { users, loading, fetchUsers, createUser, updateUser, deleteUser } = useUsers()
   
   // Hook untuk permission
-  const { canAccessDataPengguna, isAdmin } = usePermission()
+  const { canAccessDataPengguna, isAdmin, isLoading: permissionLoading } = usePermission()
 
-  // Check if user has permission to access this page
-  if (!canAccessDataPengguna) {
-    return (
-      <AccessDenied 
-        title="Akses Data Pengguna Ditolak"
-        message="Hanya administrator yang dapat mengakses halaman Data Pengguna."
-      />
-    )
-  }
+  // Effect untuk mendeteksi logout
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const token = getStoredToken()
+      if (!token && !permissionLoading) {
+        setIsLoggingOut(true)
+      }
+    }
+
+    // Check immediately
+    checkAuthStatus()
+
+    // Listen for storage changes (logout)
+    const handleStorageChange = () => {
+      checkAuthStatus()
+    }
+
+    // Listen for token change events
+    const handleTokenChange = () => {
+      checkAuthStatus()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('tokenChange', handleTokenChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('tokenChange', handleTokenChange)
+    }
+  }, [permissionLoading])
 
   // Memoized filtered users
   const filteredUsers = useMemo(() => {
@@ -49,6 +73,36 @@ export default function DataPenggunaPage() {
         (user.jobType && user.jobType.toLowerCase().includes(lowerSearchTerm))
     )
   }, [users, searchTerm])
+
+  // Show loading while checking permissions
+  if (permissionLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="ml-2 text-gray-600">Memeriksa izin akses...</span>
+      </div>
+    )
+  }
+
+  // Show loading during logout
+  if (isLoggingOut) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="ml-2 text-gray-600">Logging out...</span>
+      </div>
+    )
+  }
+
+  // Check if user has permission to access this page
+  if (!canAccessDataPengguna) {
+    return (
+      <AccessDenied 
+        title="Akses Data Pengguna Ditolak"
+        message="Hanya administrator yang dapat mengakses halaman Data Pengguna."
+      />
+    )
+  }
 
   // Handle search
   const handleSearch = (term: string) => {
@@ -178,7 +232,8 @@ export default function DataPenggunaPage() {
   }
 
   return (
-    <div className="space-y-6 pb-8 pt-4 lg:pt-0 animate-fadeIn">
+    <ErrorBoundary>
+      <div className="space-y-6 pb-8 pt-4 lg:pt-0 animate-fadeIn">
       <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
         <h1 className="text-xl font-bold text-gray-800 sm:text-2xl">Data Pengguna</h1>
         <div className="text-sm text-gray-500">Total: {filteredUsers.length} pengguna</div>
@@ -419,6 +474,7 @@ export default function DataPenggunaPage() {
         user={selectedUser}
       />
     </div>
+    </ErrorBoundary>
   )
 }
 

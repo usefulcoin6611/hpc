@@ -56,20 +56,25 @@ export function DeleteUserDialog({ isOpen, onClose, onConfirm, user }: DeleteUse
     }
   }
 
-  if (!user) return null
-
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-red-600">
-            <AlertTriangle className="h-5 w-5" />
-            Hapus Pengguna
-          </DialogTitle>
-          <DialogDescription>
-            Apakah Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.
-          </DialogDescription>
-        </DialogHeader>
+        {!user ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="ml-2 text-gray-600">Memuat data pengguna...</span>
+          </div>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="h-5 w-5" />
+                Hapus Pengguna
+              </DialogTitle>
+              <DialogDescription>
+                Apakah Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.
+              </DialogDescription>
+            </DialogHeader>
         
         <div className="py-4">
           <div className="rounded-lg bg-red-50 border border-red-200 p-4">
@@ -115,6 +120,8 @@ export function DeleteUserDialog({ isOpen, onClose, onConfirm, user }: DeleteUse
             )}
           </Button>
         </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )
