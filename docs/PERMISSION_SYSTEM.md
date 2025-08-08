@@ -23,11 +23,13 @@ Sistem permission ini memungkinkan kontrol akses yang berbeda untuk setiap role 
 
 ## Permission Matrix
 
+> **Catatan**: Menu "Jenis Barang" saat ini disembunyikan untuk semua role sementara.
+
 | Menu | Admin | Supervisor | Staff |
 |------|-------|------------|-------|
 | Dashboard | ✅ | ✅ | ✅ |
 | Master Barang | ✅ | ✅ | ❌ |
-| Jenis Barang | ✅ | ✅ | ❌ |
+| Jenis Barang | ❌ | ❌ | ❌ |
 | Barang Masuk | ✅ | ✅ | ❌ |
 | Transaksi | ✅ | ✅ | ✅ |
 | Approver | ✅ | ✅ | ❌ |

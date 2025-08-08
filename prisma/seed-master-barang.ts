@@ -19,7 +19,6 @@ async function main() {
       id: 1,
       kode: '70010022002',
       nama: 'CORGHI ET1450 MOTOR',
-      kategori: 'Motor',
       satuan: 'Unit',
       stok: 9,
       stokMinimum: 0,
@@ -31,7 +30,6 @@ async function main() {
       id: 2,
       kode: '70790030035',
       nama: 'HUNTER Tire Changer TCX 45 Red - 1 Ph',
-      kategori: 'Tire Changer',
       satuan: 'Unit',
       stok: 8,
       stokMinimum: 1,
@@ -43,7 +41,6 @@ async function main() {
       id: 3,
       kode: '70790020019',
       nama: 'HUNTER Smart Weight Pro',
-      kategori: 'Balancing',
       satuan: 'Unit',
       stok: 10,
       stokMinimum: 2,
@@ -55,7 +52,6 @@ async function main() {
       id: 4,
       kode: '70790030012',
       nama: 'HUNTER Hawkeye Elite',
-      kategori: 'Alignment',
       satuan: 'Unit',
       stok: 8,
       stokMinimum: 1,
@@ -66,10 +62,16 @@ async function main() {
   ]
 
   try {
-    // Hapus data yang ada (opsional)
-    console.log('🗑️  Cleaning existing data...')
-    await prisma.barang.deleteMany({})
-    await prisma.jenisBarang.deleteMany({})
+    // Check if data already exists
+    const existingJenisBarang = await prisma.jenisBarang.findFirst()
+    const existingBarang = await prisma.barang.findFirst()
+    
+    if (existingJenisBarang || existingBarang) {
+      console.log('⚠️  Data sudah ada, skipping seed...')
+      return
+    }
+    
+    console.log('📦 Creating new data...')
 
     // Insert jenis barang
     console.log('📦 Creating jenis barang...')

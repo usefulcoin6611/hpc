@@ -185,6 +185,11 @@ export function EditAssemblyDialog({
     setItems(prev => prev.map((item, i) => i === index ? { ...item, [field]: value } : item))
   }
 
+  const handleToggleAll = () => {
+    const allChecked = items.length > 0 && items.every(item => item.hasil)
+    setItems(prev => prev.map(item => ({ ...item, hasil: !allChecked })))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -251,8 +256,8 @@ export function EditAssemblyDialog({
                   </p>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                {!isDetailView && (
+              {!isDetailView && (
+                <div className="flex items-center gap-2">
                   <Button
                     type="button"
                     variant="outline"
@@ -264,8 +269,20 @@ export function EditAssemblyDialog({
                     <Camera className="h-4 w-4" />
                     Foto
                   </Button>
-                )}
-                {!isDetailView && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleToggleAll}
+                    disabled={isLoading}
+                    className={`flex items-center gap-2 ${
+                      items.length > 0 && items.every(item => item.hasil)
+                        ? 'text-orange-600 border-orange-200 hover:bg-orange-50'
+                        : 'text-blue-600 border-blue-200 hover:bg-blue-50'
+                    }`}
+                  >
+                    {items.length > 0 && items.every(item => item.hasil) ? 'Uncheck All' : 'Check All'}
+                  </Button>
                   <Button
                     type="button"
                     variant="outline"
@@ -277,8 +294,8 @@ export function EditAssemblyDialog({
                     <Plus className="h-4 w-4" />
                     Tambah Item
                   </Button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </DialogHeader>
           
@@ -354,6 +371,24 @@ export function EditAssemblyDialog({
                       <div className="flex-shrink-0 mb-4">
                         <h3 className="text-lg font-semibold text-gray-900">Foto Assembly</h3>
                       </div>
+                      
+                      {/* Upload Section */}
+                      {!isDetailView && (
+                        <div className="flex-shrink-0 mb-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowUploadDialog(true)}
+                            disabled={isLoading}
+                            className="flex items-center gap-2"
+                          >
+                            <Camera className="h-4 w-4" />
+                            Upload Foto Baru
+                          </Button>
+                        </div>
+                      )}
+                      
                       <div className="flex-1 overflow-auto">
                         {isLoadingFotos ? (
                           <div className="flex items-center justify-center h-full">

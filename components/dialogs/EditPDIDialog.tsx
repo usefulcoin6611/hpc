@@ -336,17 +336,6 @@ export function EditPDIDialog({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => setShowUploadDialog(true)}
-                    disabled={isLoading}
-                    className="flex items-center gap-2"
-                  >
-                    <Camera className="h-4 w-4" />
-                    Foto
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
                     onClick={handleToggleAll}
                     disabled={isLoading}
                     className={`flex items-center gap-2 ${
@@ -449,6 +438,24 @@ export function EditPDIDialog({
                       <div className="flex-shrink-0 mb-4">
                         <h3 className="text-lg font-semibold text-gray-900">Foto PDI</h3>
                       </div>
+                      
+                      {/* Upload Section */}
+                      {!isDetailView && (
+                        <div className="flex-shrink-0 mb-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowUploadDialog(true)}
+                            disabled={isLoading}
+                            className="flex items-center gap-2"
+                          >
+                            <Camera className="h-4 w-4" />
+                            Upload Foto Baru
+                          </Button>
+                        </div>
+                      )}
+                      
                       <div className="flex-1 overflow-auto">
                         {isLoadingFotos ? (
                           <div className="flex items-center justify-center h-full">

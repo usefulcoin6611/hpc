@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
 import {
-  Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -105,8 +104,7 @@ export function EditUserDialog({ isOpen, onClose, onSubmit, user }: EditUserDial
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
+    <DialogWrapper open={isOpen} onOpenChange={handleClose} className="sm:max-w-[500px]">
         {!user ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -226,7 +224,6 @@ export function EditUserDialog({ isOpen, onClose, onSubmit, user }: EditUserDial
         </form>
           </>
         )}
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 }

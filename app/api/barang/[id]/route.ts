@@ -29,7 +29,7 @@ export async function PUT(
       )
     }
 
-    const { kode, nama, jenis_id, kategori, satuan, stok, stok_minimum, lokasi, deskripsi } = await request.json()
+    const { kode, nama, jenis_id, satuan, stok, stok_minimum, lokasi, deskripsi } = await request.json()
 
     if (!kode || !nama) {
       return NextResponse.json(
@@ -73,7 +73,6 @@ export async function PUT(
         kode,
         nama,
         jenisId: jenis_id || null,
-        kategori: kategori || null,
         satuan: satuan || null,
         stok: stok || 0,
         stokMinimum: stok_minimum || 0,
@@ -89,7 +88,6 @@ export async function PUT(
         id: updatedBarang.id,
         kode: updatedBarang.kode,
         nama: updatedBarang.nama,
-        kategori: updatedBarang.kategori,
         satuan: updatedBarang.satuan,
         stok: updatedBarang.stok,
         stokMinimum: updatedBarang.stokMinimum,

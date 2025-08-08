@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
+import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -53,8 +54,7 @@ export function AddBarangDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent>
+    <DialogWrapper open={isOpen} onOpenChange={handleClose}>
         <DialogHeader>
           <DialogTitle>Tambah Barang Baru</DialogTitle>
           <DialogDescription>
@@ -100,7 +100,6 @@ export function AddBarangDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 

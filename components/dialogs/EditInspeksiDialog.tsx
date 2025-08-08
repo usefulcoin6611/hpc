@@ -166,9 +166,12 @@ export function EditInspeksiDialog({
   }
 
   const updateItem = (index: number, field: keyof InspeksiItem, value: string | boolean) => {
-    const newItems = [...items]
-    newItems[index] = { ...newItems[index], [field]: value }
-    setItems(newItems)
+    setItems(prev => prev.map((item, i) => i === index ? { ...item, [field]: value } : item))
+  }
+
+  const handleToggleAll = () => {
+    const allChecked = items.length > 0 && items.every(item => item.hasil)
+    setItems(prev => prev.map(item => ({ ...item, hasil: !allChecked })))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -250,6 +253,20 @@ export function EditInspeksiDialog({
                   >
                     <Camera className="h-4 w-4" />
                     Foto
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleToggleAll}
+                    disabled={isLoading}
+                    className={`flex items-center gap-2 ${
+                      items.length > 0 && items.every(item => item.hasil)
+                        ? 'text-orange-600 border-orange-200 hover:bg-orange-50'
+                        : 'text-blue-600 border-blue-200 hover:bg-blue-50'
+                    }`}
+                  >
+                    {items.length > 0 && items.every(item => item.hasil) ? 'Uncheck All' : 'Check All'}
                   </Button>
                   <Button
                     type="button"
@@ -343,6 +360,24 @@ export function EditInspeksiDialog({
                       <div className="flex-shrink-0 mb-4">
                         <h3 className="text-lg font-semibold text-gray-900">Foto Inspeksi</h3>
                       </div>
+                      
+                      {/* Upload Section */}
+                      {!isDetailView && (
+                        <div className="flex-shrink-0 mb-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowUploadDialog(true)}
+                            disabled={isLoading}
+                            className="flex items-center gap-2"
+                          >
+                            <Camera className="h-4 w-4" />
+                            Upload Foto Baru
+                          </Button>
+                        </div>
+                      )}
+                      
                       <div className="flex-1 overflow-auto">
                         {isLoadingFotos ? (
                           <div className="flex items-center justify-center h-full">

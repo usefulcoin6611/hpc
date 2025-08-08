@@ -2,9 +2,8 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
 import {
-  Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -57,8 +56,7 @@ export function DeleteUserDialog({ isOpen, onClose, onConfirm, user }: DeleteUse
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
+    <DialogWrapper open={isOpen} onOpenChange={handleClose} className="sm:max-w-[425px]">
         {!user ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -122,7 +120,6 @@ export function DeleteUserDialog({ isOpen, onClose, onConfirm, user }: DeleteUse
         </DialogFooter>
           </>
         )}
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 }

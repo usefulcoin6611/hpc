@@ -70,7 +70,6 @@ export interface Barang {
   kode: string
   nama: string
   jenis: JenisBarang
-  kategori: string
   satuan: string
   stok: number
   stokMinimum: number

@@ -4,9 +4,10 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { BarChart, Download, FileText, PieChart, ChevronRight, LineChart, Printer } from "lucide-react"
+import { BarChart, Download, FileText, PieChart, ChevronRight, LineChart, Printer, Search, X } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { useLaporanInventaris } from "@/hooks/use-laporan-inventaris"
 
@@ -46,9 +47,20 @@ export default function LaporanPage() {
   // Form state
   const [selectedItemCode, setSelectedItemCode] = useState("")
   const [selectedPeriod, setSelectedPeriod] = useState("all")
+  const [searchTerm, setSearchTerm] = useState("")
   
   // Hook untuk data inventaris
   const { inventoryData, loading, fetchInventoryReport } = useLaporanInventaris()
+
+  // Filter data berdasarkan search term
+  const filteredData = inventoryData.filter(item => {
+    if (!searchTerm) return true
+    const searchLower = searchTerm.toLowerCase()
+    return (
+      item.kodeBarang.toLowerCase().includes(searchLower) ||
+      item.namaBarang.toLowerCase().includes(searchLower)
+    )
+  })
 
   // Auto-fetch data on page load
   useEffect(() => {
@@ -72,7 +84,7 @@ export default function LaporanPage() {
     const headers = ['No', 'Kode Barang', 'Nama Barang', 'Total Qty', 'Qty Ready', 'Qty Not Ready']
     const csvContent = [
       headers.join(','),
-      ...inventoryData.map(item => [
+      ...filteredData.map(item => [
         item.id,
         item.kodeBarang,
         `"${item.namaBarang}"`,
@@ -99,7 +111,7 @@ export default function LaporanPage() {
     const headers = ['No', 'Kode Barang', 'Nama Barang', 'Total Qty', 'Qty Ready', 'Qty Not Ready']
     const csvContent = [
       headers.join(','),
-      ...inventoryData.map(item => [
+      ...filteredData.map(item => [
         item.id,
         item.kodeBarang,
         `"${item.namaBarang}"`,
@@ -143,13 +155,7 @@ export default function LaporanPage() {
           <div className="space-y-6 p-6">
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-medium">Laporan Inventaris</CardTitle>
-                <p className="text-sm text-gray-500">Laporan stok barang dan inventaris gudang</p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Periode Laporan</label>
+              <label className="text-sm font-medium text-gray-700">Periode Laporan</label>
                     <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
                       <SelectTrigger className="w-full rounded-xl border-gray-200">
                         <SelectValue placeholder="Pilih periode" />
@@ -162,6 +168,11 @@ export default function LaporanPage() {
                         ))}
                       </SelectContent>
                     </Select>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    
                   </div>
                 </div>
 
@@ -177,7 +188,39 @@ export default function LaporanPage() {
 
                 <div className="mt-8 rounded-xl border border-gray-200 bg-gray-50 p-6">
                     <div className="mb-4 flex items-center justify-between">
-                      <h3 className="text-lg font-medium text-gray-800">Preview Laporan</h3>
+                      <div className="flex items-center gap-4">
+                        <h3 className="text-lg font-medium text-gray-800">Preview Laporan</h3>
+                        
+                        {/* Search Box */}
+                        <div className="relative">
+                          <Input
+                            type="text"
+                            placeholder="kode barang / nama barang"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-64 rounded-lg border-gray-200 bg-white pl-3 pr-10 py-2 focus:border-primary focus:ring-primary"
+                          />
+                          <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                          {searchTerm && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSearchTerm("")}
+                              className="absolute right-8 top-1/2 h-6 w-6 -translate-y-1/2 p-0 hover:bg-gray-100"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
+                        
+                        {/* Search Results Info */}
+                        {searchTerm && (
+                          <div className="text-sm text-gray-600">
+                            {filteredData.length} dari {inventoryData.length} item
+                          </div>
+                        )}
+                      </div>
+                      
                       <div className="flex gap-2">
                         <Button 
                           onClick={handleDownloadExcel}
@@ -223,14 +266,19 @@ export default function LaporanPage() {
                                 <div className="text-gray-500">Loading...</div>
                               </TableCell>
                             </TableRow>
-                          ) : inventoryData.length === 0 ? (
+                          ) : filteredData.length === 0 ? (
                             <TableRow>
                               <TableCell colSpan={6} className="text-center py-8">
-                                <div className="text-gray-500">Tidak ada data inventaris untuk periode ini</div>
+                                <div className="text-gray-500">
+                                  {searchTerm 
+                                    ? `Tidak ada data yang cocok dengan pencarian "${searchTerm}"`
+                                    : "Tidak ada data inventaris untuk periode ini"
+                                  }
+                                </div>
                               </TableCell>
                             </TableRow>
                           ) : (
-                            inventoryData.map((item, index) => (
+                            filteredData.map((item, index) => (
                               <TableRow key={item.id} className="border-t border-gray-100 hover:bg-gray-50">
                                 <TableCell className="text-center font-medium text-gray-600">{index + 1}</TableCell>
                                 <TableCell className="text-gray-800">{item.kodeBarang}</TableCell>
@@ -251,12 +299,17 @@ export default function LaporanPage() {
                         <div className="flex items-center justify-center py-8">
                           <div className="text-gray-500">Loading...</div>
                         </div>
-                      ) : inventoryData.length === 0 ? (
+                      ) : filteredData.length === 0 ? (
                         <div className="flex items-center justify-center py-8">
-                          <div className="text-gray-500">Tidak ada data inventaris untuk periode ini</div>
+                          <div className="text-gray-500">
+                            {searchTerm 
+                              ? `Tidak ada data yang cocok dengan pencarian "${searchTerm}"`
+                              : "Tidak ada data inventaris untuk periode ini"
+                            }
+                          </div>
                         </div>
                       ) : (
-                        inventoryData.map((item, index) => (
+                        filteredData.map((item, index) => (
                           <div key={item.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-soft">
                             <div className="mb-3 flex items-center justify-between">
                               <span className="font-medium text-gray-800">#{index + 1}</span>

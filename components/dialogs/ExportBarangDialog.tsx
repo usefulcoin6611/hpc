@@ -1,6 +1,7 @@
 "use client"
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
+import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { FileText } from "lucide-react"
 import { exportToCSV, exportToExcel } from "@/lib/import-utils"
@@ -23,20 +24,13 @@ export function ExportBarangDialog({
         return
       }
       
-      // Prepare data for export (with ID column to match import format)
+      // Prepare data for export (only Kode Barang and Nama Barang)
       const exportData = data.map(item => ({
-        'ID': item.id,
         'Kode Barang': item.kode,
-        'Nama Barang': item.nama,
-        'Kategori': item.kategori || '',
-        'Satuan': item.satuan || '',
-        'Stok': item.stok || 0,
-        'Stok Minimum': item.stokMinimum || 0,
-        'Lokasi': item.lokasi || '',
-        'Deskripsi': item.deskripsi || ''
+        'Nama Barang': item.nama
       }))
       
-      const headers = Object.keys(exportData[0])
+      const headers = ['Kode Barang', 'Nama Barang']
       const filename = `master_barang_${new Date().toISOString().split('T')[0]}`
 
       if (format === 'csv') {
@@ -50,12 +44,11 @@ export function ExportBarangDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+    <DialogWrapper open={isOpen} onOpenChange={onClose}>
         <DialogHeader>
           <DialogTitle>Export Data</DialogTitle>
           <DialogDescription>
-            Pilih format file untuk export data master barang
+            Pilih format file untuk export data master barang (Kode Barang dan Nama Barang)
           </DialogDescription>
         </DialogHeader>
         <div className="flex gap-2">
@@ -68,7 +61,6 @@ export function ExportBarangDialog({
             Export Excel
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 

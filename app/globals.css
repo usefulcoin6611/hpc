@@ -98,6 +98,88 @@
 
 /* Custom Scrollbar Styles for Sidebar */
 @layer components {
+  /* Fix for dialog causing main content to shrink */
+  body[data-dialog-open="true"] {
+    overflow: hidden;
+    padding-right: var(--scrollbar-width, 0px);
+  }
+
+  /* Calculate scrollbar width to prevent layout shift */
+  :root {
+    --scrollbar-width: 0px;
+  }
+
+  /* Prevent layout shift when dialog opens */
+  .flex-1 {
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  /* Ensure main content doesn't shrink unexpectedly */
+  main.flex-1 {
+    width: 0;
+    min-width: 0;
+  }
+
+  /* Additional fixes for layout shift */
+  .space-y-6 {
+    width: 100%;
+  }
+
+  /* Prevent container from shrinking */
+  .animate-fadeIn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Fix for table container */
+  .overflow-hidden {
+    width: 100%;
+  }
+
+  /* Ensure dialog doesn't affect main layout */
+  [data-dialog-open="true"] main {
+    width: 0 !important;
+    min-width: 0 !important;
+  }
+
+  /* Cross-browser scrollbar fixes */
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  /* Force scrollbar to always be visible on webkit browsers */
+  @media screen and (min-width: 1024px) {
+    body {
+      overflow-y: scroll;
+    }
+  }
+
+  /* Specific fixes for different browsers */
+  /* Chrome/Edge */
+  @media screen and (-webkit-min-device-pixel-ratio: 0) {
+    body {
+      overflow-y: scroll;
+    }
+    
+    [data-dialog-open="true"] {
+      overflow: hidden;
+      padding-right: var(--scrollbar-width, 0px);
+    }
+  }
+
+  /* Firefox */
+  @supports (scrollbar-width: thin) {
+    body {
+      scrollbar-width: thin;
+    }
+    
+    [data-dialog-open="true"] {
+      overflow: hidden;
+      padding-right: var(--scrollbar-width, 0px);
+    }
+  }
+
   /* Modal Dialog Scrollbar */
   .modal-scrollbar {
     &::-webkit-scrollbar {

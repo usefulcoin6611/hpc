@@ -65,7 +65,6 @@ model Barang {
   id                 Int                  @id
   kode               String               @unique @db.VarChar(20)
   nama               String               @db.VarChar(100)
-  kategori           String?              @db.VarChar(50)
   satuan             String?              @db.VarChar(20)
   stok               Int                  @default(0)
   stokMinimum        Int                  @default(0) @map("stok_minimum")

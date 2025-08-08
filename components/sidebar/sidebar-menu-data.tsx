@@ -29,15 +29,15 @@ export const sidebarMenuItems: MenuItem[] = [
       jobTypes: ['admin', 'supervisor'] // Hanya admin dan supervisor
     }
   },
-  {
-    title: "Jenis Barang",
-    path: "/admin/jenis-barang",
-    icon: <Tag className="h-5 w-5" />,
-    submenu: true,
-    permission: {
-      jobTypes: ['admin', 'supervisor'] // Hanya admin dan supervisor
-    }
-  },
+  // {
+  //   title: "Jenis Barang",
+  //   path: "/admin/jenis-barang",
+  //   icon: <Tag className="h-5 w-5" />,
+  //   submenu: true,
+  //   permission: {
+  //     jobTypes: ['admin', 'supervisor'] // Hanya admin dan supervisor
+  //   }
+  // },
   {
     title: "Barang Masuk",
     path: "/admin/barang-masuk",

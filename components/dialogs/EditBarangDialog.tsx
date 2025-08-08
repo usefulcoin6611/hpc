@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
+import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -23,7 +24,6 @@ export function EditBarangDialog({
   const [formData, setFormData] = useState<UpdateBarangData>({
     kode: "",
     nama: "",
-    kategori: null,
     satuan: null,
     stok: 0,
     stokMinimum: 0,
@@ -38,7 +38,6 @@ export function EditBarangDialog({
       setFormData({
         kode: barang.kode,
         nama: barang.nama,
-        kategori: barang.kategori,
         satuan: barang.satuan,
         stok: barang.stok || 0,
         stokMinimum: barang.stokMinimum || 0,
@@ -75,8 +74,7 @@ export function EditBarangDialog({
   if (!barang) return null
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent>
+    <DialogWrapper open={isOpen} onOpenChange={handleClose}>
         <DialogHeader>
           <DialogTitle>Edit Barang</DialogTitle>
           <DialogDescription>
@@ -122,7 +120,6 @@ export function EditBarangDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 

@@ -21,7 +21,7 @@ export function usePermission() {
   const isStaff = checkPermission(undefined, ['staff'])
   
   const canAccessMasterBarang = checkPermission(undefined, ['admin', 'supervisor'])
-  const canAccessJenisBarang = checkPermission(undefined, ['admin', 'supervisor'])
+  // const canAccessJenisBarang = checkPermission(undefined, ['admin', 'supervisor'])
   const canAccessBarangMasuk = checkPermission(undefined, ['admin', 'supervisor'])
   const canAccessTransaksi = checkPermission(undefined, ['admin', 'supervisor', 'staff'])
   const canAccessApprover = checkPermission(undefined, ['admin', 'supervisor'])
@@ -39,7 +39,7 @@ export function usePermission() {
     isSupervisor,
     isStaff,
     canAccessMasterBarang,
-    canAccessJenisBarang,
+    // canAccessJenisBarang,
     canAccessBarangMasuk,
     canAccessTransaksi,
     canAccessApprover,

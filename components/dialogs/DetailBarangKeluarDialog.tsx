@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
+import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -234,8 +235,7 @@ export function DetailBarangKeluarDialog({
 
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <DialogWrapper open={isOpen} onOpenChange={handleClose} className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Detail Barang Keluar</DialogTitle>
           <DialogDescription>
@@ -378,7 +378,6 @@ export function DetailBarangKeluarDialog({
             Export Excel
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 

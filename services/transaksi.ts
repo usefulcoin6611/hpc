@@ -66,6 +66,19 @@ class TransaksiService {
       throw error
     }
   }
+
+  async updateStatus(transaksiId: string, status: string): Promise<boolean> {
+    try {
+      await this.makeRequest(`/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ id: transaksiId, status })
+      })
+      return true
+    } catch (error) {
+      console.error('Error updating transaksi status:', error)
+      throw error
+    }
+  }
 }
 
 export const transaksiService = new TransaksiService() 

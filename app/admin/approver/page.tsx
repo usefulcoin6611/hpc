@@ -7,9 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
 import {
-  Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -690,7 +689,22 @@ export default function ApproverPage() {
                             onClick={() => handleDetail(transaction)}
                             className="h-8 px-3 text-xs"
                           >
-                            <Edit className="h-3 w-3 mr-1" />
+                            {/* Ganti <Eye /> dengan ikon yang sudah diimport, misal dari lucide-react */}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3 w-3 mr-1"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M1.5 12s3.75-7.5 10.5-7.5S22.5 12 22.5 12s-3.75 7.5-10.5 7.5S1.5 12 1.5 12z"
+                              />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
                             Detail
                           </Button>
                           <Button
@@ -736,8 +750,7 @@ export default function ApproverPage() {
       </div>
 
       {/* Detail Dialog */}
-      <Dialog open={isInspeksiDialogOpen} onOpenChange={setIsInspeksiDialogOpen}>
-        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
+      <DialogWrapper open={isInspeksiDialogOpen} onOpenChange={setIsInspeksiDialogOpen} className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">
               Detail Inspeksi Mesin - {selectedNoSeri}
@@ -756,8 +769,7 @@ export default function ApproverPage() {
               Tutup
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      </DialogWrapper>
 
       {/* Dialogs untuk update */}
       <EditInspeksiDialog
@@ -774,7 +786,7 @@ export default function ApproverPage() {
         noSeri={selectedNoSeri}
         currentItems={selectedInspeksiItems}
         namaBarang={selectedNamaBarang}
-        isDetailView={false}
+        isDetailView={true}
       />
 
       <EditAssemblyDialog
@@ -791,7 +803,7 @@ export default function ApproverPage() {
         noSeri={selectedNoSeri}
         currentItems={selectedAssemblyItems}
         namaBarang={selectedNamaBarang}
-        isDetailView={false}
+        isDetailView={true}
       />
 
       <EditPaintingDialog
@@ -808,7 +820,7 @@ export default function ApproverPage() {
         noSeri={selectedNoSeri}
         currentItems={selectedPaintingItems}
         namaBarang={selectedNamaBarang}
-        isDetailView={false}
+        isDetailView={true}
       />
 
       <EditQCDialog
@@ -825,7 +837,7 @@ export default function ApproverPage() {
         noSeri={selectedNoSeri}
         currentItems={selectedQCItems}
         namaBarang={selectedNamaBarang}
-        isDetailView={false}
+        isDetailView={true}
       />
 
       <EditPDIDialog
@@ -842,7 +854,7 @@ export default function ApproverPage() {
         noSeri={selectedNoSeri}
         currentItems={selectedPDIItems}
         namaBarang={selectedNamaBarang}
-        isDetailView={false}
+        isDetailView={true}
       />
 
       <EditPindahLokasiDialog
@@ -857,7 +869,7 @@ export default function ApproverPage() {
         }}
         noSeri={selectedNoSeri}
         namaBarang={selectedNamaBarang}
-        isDetailView={false}
+        isDetailView={true}
       />
     </div>
   )

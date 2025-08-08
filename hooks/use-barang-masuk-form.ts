@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { IncomingItemDetail, IncomingItem } from "@/types/barang-masuk"
 
 export function useBarangMasukForm() {
@@ -23,43 +23,43 @@ export function useBarangMasukForm() {
   const [editIncomingItemDetails, setEditIncomingItemDetails] = useState<IncomingItemDetail[]>([])
 
   // Form handlers for new item
-  const handleAddDetailItem = () => {
-    setNewIncomingItemDetails([
-      ...newIncomingItemDetails,
-      { id: Date.now(), namaBarang: "", jumlah: 0, units: [] },
+  const handleAddDetailItem = useCallback(() => {
+    setNewIncomingItemDetails(prev => [
+      ...prev,
+      { id: Date.now(), kodeBarang: "", namaBarang: "", jumlah: 0, units: [] },
     ])
-  }
+  }, [])
 
-  const handleUpdateDetailItem = (id: number, field: keyof IncomingItemDetail, value: string | number) => {
-    setNewIncomingItemDetails(
-      newIncomingItemDetails.map((detail) => (detail.id === id ? { ...detail, [field]: value } : detail)),
+  const handleUpdateDetailItem = useCallback((id: number, field: keyof IncomingItemDetail, value: string | number) => {
+    setNewIncomingItemDetails(prev =>
+      prev.map((detail) => (detail.id === id ? { ...detail, [field]: value } : detail))
     )
-  }
+  }, [])
 
-  const handleRemoveDetailItem = (id: number) => {
-    setNewIncomingItemDetails(newIncomingItemDetails.filter((detail) => detail.id !== id))
-  }
+  const handleRemoveDetailItem = useCallback((id: number) => {
+    setNewIncomingItemDetails(prev => prev.filter((detail) => detail.id !== id))
+  }, [])
 
   // Form handlers for edit item
-  const handleAddEditDetailItem = () => {
-    setEditIncomingItemDetails([
-      ...editIncomingItemDetails,
-      { id: Date.now(), namaBarang: "", jumlah: 0, units: [] },
+  const handleAddEditDetailItem = useCallback(() => {
+    setEditIncomingItemDetails(prev => [
+      ...prev,
+      { id: Date.now(), kodeBarang: "", namaBarang: "", jumlah: 0, units: [] },
     ])
-  }
+  }, [])
 
-  const handleUpdateEditDetailItem = (id: number, field: keyof IncomingItemDetail, value: string | number) => {
-    setEditIncomingItemDetails(
-      editIncomingItemDetails.map((detail) => (detail.id === id ? { ...detail, [field]: value } : detail)),
+  const handleUpdateEditDetailItem = useCallback((id: number, field: keyof IncomingItemDetail, value: string | number) => {
+    setEditIncomingItemDetails(prev =>
+      prev.map((detail) => (detail.id === id ? { ...detail, [field]: value } : detail))
     )
-  }
+  }, [])
 
-  const handleRemoveEditDetailItem = (id: number) => {
+  const handleRemoveEditDetailItem = useCallback((id: number) => {
     setEditIncomingItemDetails(prev => prev.filter((detail) => detail.id !== id))
-  }
+  }, [])
 
   // Reset form
-  const resetNewForm = () => {
+  const resetNewForm = useCallback(() => {
     setNewIncomingItem({
       tanggal: "",
       kodeKedatangan: "",
@@ -68,9 +68,9 @@ export function useBarangMasukForm() {
       status: "",
     })
     setNewIncomingItemDetails([])
-  }
+  }, [])
 
-  const resetEditForm = () => {
+  const resetEditForm = useCallback(() => {
     setEditIncomingItem({
       tanggal: "",
       kodeKedatangan: "",
@@ -79,10 +79,10 @@ export function useBarangMasukForm() {
       status: "",
     })
     setEditIncomingItemDetails([])
-  }
+  }, [])
 
   // Set edit form data
-  const setEditFormData = (item: IncomingItem & { details: IncomingItemDetail[] }) => {
+  const setEditFormData = useCallback((item: IncomingItem & { details: IncomingItemDetail[] }) => {
     setEditIncomingItem({
       tanggal: item.tanggal,
       kodeKedatangan: item.kodeKedatangan,
@@ -91,7 +91,7 @@ export function useBarangMasukForm() {
       status: item.status,
     })
     setEditIncomingItemDetails([...item.details])
-  }
+  }, [])
 
   return {
     // New form state

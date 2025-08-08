@@ -52,7 +52,8 @@ export async function GET(request: NextRequest) {
           jenis: {
             select: {
               id: true,
-              nama: true
+              nama: true,
+              deskripsi: true
             }
           }
         },
@@ -68,25 +69,25 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: barang.map(item => ({
-        id: item.id,
-        kode: item.kode,
-        nama: item.nama,
-        jenis: item.jenis ? {
-          id: item.jenis.id,
-          nama: item.jenis.nama
-        } : null,
-        kategori: item.kategori,
-        satuan: item.satuan,
-        stok: item.stok,
-        stokMinimum: item.stokMinimum,
-
-        lokasi: item.lokasi,
-        deskripsi: item.deskripsi,
-        isActive: item.isActive,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt
-      })),
+              data: barang.map(item => ({
+          id: item.id,
+          kode: item.kode,
+          nama: item.nama,
+          jenisId: item.jenisId,
+          jenis: item.jenis ? {
+            id: item.jenis.id,
+            nama: item.jenis.nama,
+            deskripsi: item.jenis.deskripsi
+          } : null,
+          satuan: item.satuan,
+          stok: item.stok,
+          stokMinimum: item.stokMinimum,
+          lokasi: item.lokasi,
+          deskripsi: item.deskripsi,
+          isActive: item.isActive,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt
+        })),
       pagination: {
         page,
         limit,
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
 
     const payload = authenticateToken(token)
 
-    const { id, kode, nama, jenis_id, kategori, satuan, stok, stok_minimum, lokasi, deskripsi } = await request.json()
+    const { id, kode, nama, jenis_id, satuan, stok, stok_minimum, lokasi, deskripsi } = await request.json()
 
     if (!kode || !nama) {
       return NextResponse.json(
@@ -176,7 +177,6 @@ export async function POST(request: NextRequest) {
         kode,
         nama,
         jenisId: jenis_id || null,
-        kategori: kategori || null,
         satuan: satuan || null,
         stok: stok || 0,
         stokMinimum: stok_minimum || 0,
@@ -193,7 +193,6 @@ export async function POST(request: NextRequest) {
         id: newBarang.id,
         kode: newBarang.kode,
         nama: newBarang.nama,
-        kategori: newBarang.kategori,
         satuan: newBarang.satuan,
         stok: newBarang.stok,
         stokMinimum: newBarang.stokMinimum,

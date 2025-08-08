@@ -2,9 +2,8 @@
 
 import React from "react"
 import { Button } from "@/components/ui/button"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
 import {
-  Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -29,8 +28,7 @@ export function DeleteBarangMasukDialog({
   isLoading = false
 }: DeleteBarangMasukDialogProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+    <DialogWrapper open={isOpen} onOpenChange={onOpenChange} className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-red-600">
             <AlertTriangle className="h-5 w-5" />
@@ -114,7 +112,6 @@ export function DeleteBarangMasukDialog({
             )}
           </Button>
         </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 

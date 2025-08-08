@@ -450,6 +450,16 @@ export function useTransaksi() {
     // Tidak ada fetch otomatis, user harus search dulu
   }, [])
 
+  const updateTransactionStatus = async (transaksiId: string, status: string) => {
+    try {
+      const result = await transaksiService.updateStatus(transaksiId, status)
+      return result
+    } catch (error) {
+      console.error('Error updating transaction status:', error)
+      throw error
+    }
+  }
+
   return {
     // State
     transactions,
@@ -474,5 +484,6 @@ export function useTransaksi() {
     updateQCData,
     getPDIData,
     updatePDIData,
+    updateTransactionStatus,
   }
 } 

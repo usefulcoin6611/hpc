@@ -54,13 +54,20 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Get jenis barang with pagination
+    // Get jenis barang with pagination and barang count
     const [jenisBarang, total] = await Promise.all([
       prisma.jenisBarang.findMany({
         where: whereClause,
         orderBy: { createdAt: 'desc' },
         skip: offset,
-        take: limit
+        take: limit,
+        include: {
+          _count: {
+            select: {
+              barang: true
+            }
+          }
+        }
       }),
       prisma.jenisBarang.count({ where: whereClause })
     ])
@@ -73,7 +80,8 @@ export async function GET(request: NextRequest) {
         deskripsi: item.deskripsi,
         isActive: item.isActive,
         createdAt: item.createdAt,
-        updatedAt: item.updatedAt
+        updatedAt: item.updatedAt,
+        barangCount: item._count.barang
       })),
       pagination: {
         page,

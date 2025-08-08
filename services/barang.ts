@@ -4,12 +4,17 @@ export interface Barang {
   id: number
   kode: string
   nama: string
-  kategori?: string | null
   satuan?: string | null
   stok?: number
   stokMinimum?: number
   lokasi?: string | null
   deskripsi?: string | null
+  jenisId?: number | null
+  jenis?: {
+    id: number
+    nama: string
+    deskripsi?: string | null
+  } | null
   createdAt?: string
   updatedAt?: string
 }
@@ -18,7 +23,6 @@ export interface CreateBarangData {
   id?: number
   kode: string
   nama: string
-  kategori?: string | null
   satuan?: string | null
   stok?: number
   stokMinimum?: number
@@ -29,7 +33,6 @@ export interface CreateBarangData {
 export interface UpdateBarangData {
   kode: string
   nama: string
-  kategori?: string | null
   satuan?: string | null
   stok?: number
   stokMinimum?: number
@@ -167,6 +170,19 @@ class BarangService {
       return result.data || []
     } catch (error) {
       console.error('Error fetching active barang:', error)
+      throw error
+    }
+  }
+
+  async assignToJenis(barangId: number, jenisId: number | null): Promise<Barang> {
+    try {
+      const result = await this.makeRequest(`/${barangId}/assign-jenis`, {
+        method: 'PUT',
+        body: JSON.stringify({ jenisId })
+      })
+      return result.data
+    } catch (error) {
+      console.error('Error assigning barang to jenis:', error)
       throw error
     }
   }

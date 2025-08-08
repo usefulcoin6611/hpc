@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
+import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Barang } from "@/services/barang"
 
@@ -43,8 +44,7 @@ export function DeleteBarangDialog({
   if (!barang) return null
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent>
+    <DialogWrapper open={isOpen} onOpenChange={handleClose}>
         <DialogHeader>
           <DialogTitle>Konfirmasi Hapus</DialogTitle>
           <DialogDescription>
@@ -70,7 +70,6 @@ export function DeleteBarangDialog({
             )}
           </Button>
         </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 

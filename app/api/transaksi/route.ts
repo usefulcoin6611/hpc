@@ -321,7 +321,7 @@ export async function GET(request: NextRequest) {
       transformedData.push(transformedItem)
     })
 
-    // Sort by tanggal ascending (terlama ke terbaru)
+    // Sort by tanggal ascending (terlama ke terbaru) - default sorting
     transformedData.sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime())
 
     return NextResponse.json({

@@ -8,6 +8,7 @@ export interface JenisBarang {
   createdAt: string
   updatedAt: string
   createdById?: number | null
+  barangCount?: number
 }
 
 export interface CreateJenisBarangData {

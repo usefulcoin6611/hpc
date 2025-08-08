@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
           where: noSeriWhereClause
         })
 
-        // Get qty ready (no seri yang SEMUA transaksinya sudah approved)
+        // Get qty ready (no seri yang QC approved dan belum keluar)
         // Ambil semua no seri untuk barang ini
         const allNoSeri = await prisma.detailBarangMasukNoSeri.findMany({
           where: noSeriWhereClause,
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
           }
         })
 
-        // Hitung no seri yang sudah ready (semua transaksinya approved)
+        // Hitung no seri yang sudah ready (QC approved dan belum keluar)
         let qtyReady = 0
         for (const noSeri of allNoSeri) {
           // Build transaksi where clause based on period
@@ -158,27 +158,29 @@ export async function GET(request: NextRequest) {
             }
           }
 
-          // Cek apakah ada transaksi yang belum approved untuk no seri ini
-          const pendingTransaksi = await prisma.transaksi.count({
+          // Cek apakah ada transaksi QC yang sudah approved untuk no seri ini
+          const qcApprovedTransaksi = await prisma.transaksi.count({
             where: {
               ...transaksiWhereClause,
-              OR: [
-                { isApproved: false },
-                { status: { notIn: ['Selesai', 'completed'] } }
-              ]
-            }
-          })
-
-          // Cek apakah ada transaksi yang sudah approved untuk no seri ini
-          const approvedTransaksi = await prisma.transaksi.count({
-            where: {
-              ...transaksiWhereClause,
+              jenisPekerjaan: { in: ['QC', 'qc_staff'] },
               isApproved: true
             }
           })
 
-          // Jika tidak ada transaksi pending dan ada transaksi approved, maka ready
-          if (pendingTransaksi === 0 && approvedTransaksi > 0) {
+          // Cek apakah ada barang keluar untuk no seri ini
+          const barangKeluar = await prisma.barangKeluar.count({
+            where: {
+              detailBarangKeluar: {
+                some: {
+                  detailBarangMasukNoSeriId: noSeri.id
+                }
+              },
+              isActive: true
+            }
+          })
+
+          // Jika ada transaksi QC approved dan belum ada barang keluar, maka ready
+          if (qcApprovedTransaksi > 0 && barangKeluar === 0) {
             qtyReady++
           }
         }

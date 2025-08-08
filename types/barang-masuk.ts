@@ -9,6 +9,7 @@ export type UnitData = {
 
 export type IncomingItemDetail = {
   id: number
+  kodeBarang: string
   namaBarang: string
   jumlah: number
   units: UnitData[]

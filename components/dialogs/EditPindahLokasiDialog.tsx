@@ -218,21 +218,7 @@ export function EditPindahLokasiDialog({
                   {isDetailView ? 'Detail Form Pindah Lokasi' : 'Form Pindah Lokasi'} - {noSeri}
                 </DialogTitle>
               </div>
-              {!isDetailView && (
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowUploadDialog(true)}
-                    disabled={isLoading}
-                    className="flex items-center gap-2"
-                  >
-                    <Camera className="h-4 w-4" />
-                    Foto
-                  </Button>
-                </div>
-              )}
+
             </div>
           </DialogHeader>
           

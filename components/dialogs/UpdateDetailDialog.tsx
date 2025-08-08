@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
+import { DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -74,8 +75,7 @@ export function UpdateDetailDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+    <DialogWrapper open={isOpen} onOpenChange={handleOpenChange} className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Update Detail Barang</DialogTitle>
         </DialogHeader>
@@ -131,7 +131,6 @@ export function UpdateDetailDialog({
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 

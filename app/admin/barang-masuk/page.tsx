@@ -90,14 +90,14 @@ export default function BarangMasukPage() {
 
     // Filter out empty details
     const validDetails = newIncomingItemDetails.filter(detail => 
-      detail.namaBarang.trim() !== "" && detail.jumlah > 0
+      detail.kodeBarang.trim() !== "" && detail.namaBarang.trim() !== "" && detail.jumlah > 0
     )
 
     // Require at least one valid detail with minimum quantity of 1
     if (validDetails.length === 0) {
       toast({
         title: "Error",
-        description: "Minimal satu detail barang dengan jumlah minimal 1 harus ditambahkan",
+        description: "Minimal satu detail barang dengan kode barang, nama barang, dan jumlah minimal 1 harus ditambahkan",
         variant: "destructive",
       })
       return
@@ -111,6 +111,7 @@ export default function BarangMasukPage() {
       noForm: newIncomingItem.noForm,
       status: newIncomingItem.status,
       details: validDetails.map(detail => ({
+        kodeBarang: detail.kodeBarang,
         namaBarang: detail.namaBarang,
         jumlah: detail.jumlah,
         units: detail.units?.map(unit => ({
@@ -149,14 +150,14 @@ export default function BarangMasukPage() {
 
     // Filter out empty details
     const validDetails = editIncomingItemDetails.filter(detail => 
-      detail.namaBarang.trim() !== "" && detail.jumlah > 0
+      detail.kodeBarang.trim() !== "" && detail.namaBarang.trim() !== "" && detail.jumlah > 0
     )
 
     // Require at least one valid detail with minimum quantity of 1
     if (validDetails.length === 0) {
       toast({
         title: "Error",
-        description: "Minimal satu detail barang dengan jumlah minimal 1 harus ditambahkan",
+        description: "Minimal satu detail barang dengan kode barang, nama barang, dan jumlah minimal 1 harus ditambahkan",
         variant: "destructive",
       })
       return
@@ -170,6 +171,7 @@ export default function BarangMasukPage() {
       noForm: editIncomingItem.noForm,
       status: editIncomingItem.status,
       details: validDetails.map(detail => ({
+        kodeBarang: detail.kodeBarang,
         namaBarang: detail.namaBarang,
         jumlah: detail.jumlah,
         units: detail.units?.map(unit => ({

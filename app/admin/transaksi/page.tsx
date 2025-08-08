@@ -5,9 +5,11 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ChevronRight, Download, FileEdit, Eye, Search, RotateCcw, Check } from "lucide-react"
+import { ChevronRight, Download, FileEdit, Eye, Search, RotateCcw, Check, ChevronUp, ChevronDown, Save, X } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useTransaksi } from "@/hooks/use-transaksi"
+import { useToast } from "@/hooks/use-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import { AddTransaksiDialog } from "@/components/dialogs/AddTransaksiDialog"
 import { EditInspeksiDialog } from "@/components/dialogs/EditInspeksiDialog"
@@ -76,7 +78,105 @@ export default function TransaksiPage() {
     updateQCData,
     getPDIData,
     updatePDIData,
+    updateTransactionStatus,
   } = useTransaksi()
+
+  const { toast } = useToast()
+
+  // State untuk sorting
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [sortedTransactions, setSortedTransactions] = useState<any[]>([])
+
+  // State untuk edit status
+  const [editingStatus, setEditingStatus] = useState<string | null>(null)
+  const [editingTransactionId, setEditingTransactionId] = useState<string | null>(null)
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
+
+  // Effect untuk sorting data
+  useEffect(() => {
+    if (transactions.length > 0) {
+      const sorted = [...transactions].sort((a, b) => {
+        const dateA = new Date(a.tanggal.split('/').reverse().join('-'))
+        const dateB = new Date(b.tanggal.split('/').reverse().join('-'))
+        
+        if (sortOrder === 'asc') {
+          return dateA.getTime() - dateB.getTime() // Terlama ke terbaru
+        } else {
+          return dateB.getTime() - dateA.getTime() // Terbaru ke terlama
+        }
+      })
+      setSortedTransactions(sorted)
+    } else {
+      setSortedTransactions([])
+    }
+  }, [transactions, sortOrder])
+
+  // Function untuk toggle sorting
+  const toggleSort = () => {
+    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')
+  }
+
+  // Function untuk memulai edit status
+  const startEditStatus = (transactionId: string, currentStatus: string) => {
+    setEditingTransactionId(transactionId)
+    setEditingStatus(currentStatus)
+  }
+
+  // Function untuk membatalkan edit status
+  const cancelEditStatus = () => {
+    setEditingTransactionId(null)
+    setEditingStatus(null)
+  }
+
+  // Function untuk menyimpan perubahan status
+  const saveStatusChange = async () => {
+    if (!editingTransactionId || !editingStatus) return
+
+    try {
+      setIsUpdatingStatus(true)
+      
+      // Call API to update status
+      await updateTransactionStatus(editingTransactionId, editingStatus)
+      
+      // Update local state after successful API call
+      const updatedTransactions = transactions.map(transaction => {
+        if (transaction.id === editingTransactionId) {
+          return { ...transaction, status: editingStatus }
+        }
+        return transaction
+      })
+      
+      // Update sorted transactions juga
+      const updatedSortedTransactions = sortedTransactions.map(transaction => {
+        if (transaction.id === editingTransactionId) {
+          return { ...transaction, status: editingStatus }
+        }
+        return transaction
+      })
+      
+      // Update state
+      setSortedTransactions(updatedSortedTransactions)
+      
+      toast({
+        title: "Berhasil",
+        description: "Status transaksi berhasil diperbarui",
+      })
+      
+      // Reset editing state
+      setEditingTransactionId(null)
+      setEditingStatus(null)
+      
+    } catch (error) {
+      console.error('Error updating status:', error)
+      toast({
+        title: "Error",
+        description: "Gagal memperbarui status transaksi",
+        variant: "destructive",
+      })
+    } finally {
+      setIsUpdatingStatus(false)
+    }
+  }
 
   // Function to convert job type enum to user-friendly display name
   const getJobTypeDisplayName = (jenisPekerjaan: string) => {
@@ -506,6 +606,9 @@ export default function TransaksiPage() {
                     <span className="text-sm text-muted-foreground">
                       {isLoading ? "Memuat..." : `${transactions.length} item ditemukan`}
                     </span>
+                    <span className="text-xs text-muted-foreground">
+                      (Urutan: {sortOrder === 'asc' ? 'Terlama ke Terbaru' : 'Terbaru ke Terlama'})
+                    </span>
                   </div>
                 )}
               </div>
@@ -551,7 +654,19 @@ export default function TransaksiPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-12">No</TableHead>
-                        <TableHead>Tanggal</TableHead>
+                        <TableHead 
+                          className="cursor-pointer hover:bg-gray-50 select-none"
+                          onClick={toggleSort}
+                        >
+                          <div className="flex items-center gap-1">
+                            Tanggal
+                            {sortOrder === 'asc' ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </div>
+                        </TableHead>
                         <TableHead>No Form</TableHead>
                         <TableHead>Jenis Pekerjaan</TableHead>
                         <TableHead>Staff</TableHead>
@@ -563,7 +678,7 @@ export default function TransaksiPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {transactions.map((transaction, index) => (
+                      {sortedTransactions.map((transaction, index) => (
                         <TableRow key={transaction.id}>
                           <TableCell className="text-center">{index + 1}</TableCell>
                           <TableCell>{transaction.tanggal}</TableCell>
@@ -571,15 +686,69 @@ export default function TransaksiPage() {
                           <TableCell>{transaction.jenisPekerjaan ? getJobTypeDisplayName(transaction.jenisPekerjaan) : '-'}</TableCell>
                           <TableCell>{transaction.staff || '-'}</TableCell>
                           <TableCell>
-                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              transaction.status === 'Diterima' || transaction.status === 'Sudah Dicek' || transaction.status === 'Sudah Painting' || transaction.status === 'Sudah Assy' || transaction.status === 'Sudah Qc' || transaction.status === 'Sudah PDI'
-                                ? 'bg-green-100 text-green-800' 
-                                : transaction.status === 'Proses' || transaction.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
-                              {transaction.status}
-                            </span>
+                            {editingTransactionId === transaction.id ? (
+                              <div className="flex items-center gap-2">
+                                <Select
+                                  value={editingStatus || ''}
+                                  onValueChange={(value) => setEditingStatus(value)}
+                                >
+                                  <SelectTrigger className="w-32 h-8 text-xs">
+                                    <SelectValue placeholder="Pilih status" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Diterima">Diterima</SelectItem>
+                                    <SelectItem value="Proses">Proses</SelectItem>
+                                    <SelectItem value="Selesai">Selesai</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-8 w-8 p-0 bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                                  onClick={saveStatusChange}
+                                  disabled={isUpdatingStatus}
+                                >
+                                  {isUpdatingStatus ? (
+                                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-green-600 border-t-transparent"></div>
+                                  ) : (
+                                    <Save className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-8 w-8 p-0 bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+                                  onClick={cancelEditStatus}
+                                  disabled={isUpdatingStatus}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                  transaction.status === 'Selesai'
+                                    ? 'bg-green-100 text-green-800' 
+                                    : transaction.status === 'Proses'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : transaction.status === 'Diterima'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : 'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {transaction.status}
+                                </span>
+                                {!transaction.isDetailRow && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-6 w-6 p-0 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                                    onClick={() => startEditStatus(transaction.id, transaction.status)}
+                                  >
+                                    <FileEdit className="h-3 w-3" />
+                                  </Button>
+                                )}
+                              </div>
+                            )}
                           </TableCell>
                           <TableCell className="text-center">{transaction.qty}</TableCell>
                           <TableCell>{transaction.ket || '-'}</TableCell>

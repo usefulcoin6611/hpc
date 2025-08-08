@@ -4,9 +4,8 @@ import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
 import {
-  Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -138,8 +137,7 @@ export function AddBarangMasukDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto modal-scrollbar">
+                <DialogWrapper open={isOpen} onOpenChange={onOpenChange} className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto modal-scrollbar">
         <DialogHeader>
           <DialogTitle>Tambah Barang Masuk Baru</DialogTitle>
           <DialogDescription>Masukkan detail transaksi dan barang yang masuk.</DialogDescription>
@@ -214,34 +212,52 @@ export function AddBarangMasukDialog({
                   <span className="sr-only">Hapus Detail Barang</span>
                 </Button>
                 <p className="mb-3 text-sm font-semibold text-gray-700">Item #{index + 1}</p>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <div className="space-y-2">
-                    <Label htmlFor={`detail-nama-barang-${detail.id}`}>Nama Barang</Label>
+                    <Label htmlFor={`detail-kode-barang-${detail.id}`}>Kode Barang</Label>
                     <Select
-                      value={detail.namaBarang}
-                      onValueChange={(value) => handleUpdateDetailItem(detail.id, "namaBarang", value)}
+                      key={`kode-barang-${detail.id}-${detail.kodeBarang}`}
+                      value={detail.kodeBarang || ""}
+                      onValueChange={(value) => {
+                        // Find the selected barang to get its nama
+                        const selectedBarang = barangList.find(barang => barang.kode === value)
+                        if (selectedBarang) {
+                          handleUpdateDetailItem(detail.id, "kodeBarang", value)
+                          handleUpdateDetailItem(detail.id, "namaBarang", selectedBarang.nama)
+                        }
+                      }}
                     >
                       <SelectTrigger className="rounded-xl">
-                        <SelectValue placeholder="Pilih barang" />
+                        <SelectValue placeholder="Pilih kode barang" />
                       </SelectTrigger>
-                                             <SelectContent>
-                         {isLoadingBarang ? (
-                           <SelectItem value="loading" disabled>
-                             Memuat data barang...
-                           </SelectItem>
-                         ) : barangList.length === 0 ? (
-                           <SelectItem value="no-data" disabled>
-                             Tidak ada data barang
-                           </SelectItem>
-                         ) : (
-                           barangList.map((barang) => (
-                             <SelectItem key={barang.id} value={barang.nama}>
-                               {barang.nama} - {barang.kode}
-                             </SelectItem>
-                           ))
-                         )}
-                       </SelectContent>
+                      <SelectContent>
+                        {isLoadingBarang ? (
+                          <SelectItem value="loading" disabled>
+                            Memuat data barang...
+                          </SelectItem>
+                        ) : barangList.length === 0 ? (
+                          <SelectItem value="no-data" disabled>
+                            Tidak ada data barang
+                          </SelectItem>
+                        ) : (
+                          barangList.map((barang) => (
+                            <SelectItem key={barang.id} value={barang.kode}>
+                              {barang.kode}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
                     </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`detail-nama-barang-${detail.id}`}>Nama Barang</Label>
+                    <Input
+                      id={`detail-nama-barang-${detail.id}`}
+                      value={detail.namaBarang}
+                      className="rounded-xl"
+                      placeholder="Nama barang akan terisi otomatis"
+                      readOnly
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor={`detail-jumlah-${detail.id}`}>Jumlah</Label>
@@ -346,7 +362,6 @@ export function AddBarangMasukDialog({
             Simpan Data
           </Button>
         </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 

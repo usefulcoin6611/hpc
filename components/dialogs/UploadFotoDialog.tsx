@@ -22,7 +22,7 @@ type FotoItem = FotoInspeksi | FotoAssembly | FotoQC | FotoPDI | FotoPainting | 
 type FotoService = {
   getFotoList: (noSeri: string) => Promise<FotoItem[]>
   uploadFoto: (file: File, noSeri: string, keterangan: string) => Promise<void>
-  deleteFoto: (fotoId: number) => Promise<void>
+  deleteFoto: (fotoId: number, noSeri?: string) => Promise<void>
 }
 
 interface UploadFotoDialogProps {
@@ -200,7 +200,7 @@ export function UploadFotoDialog({
   const handleDeleteFoto = async (foto: FotoItem) => {
     try {
       setIsDeleting(true)
-      await serviceConfig.service.deleteFoto(foto.id!)
+      await serviceConfig.service.deleteFoto(foto.id!, noSeri)
       await loadFotoList()
       
       toast({

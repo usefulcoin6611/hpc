@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
+import { DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -166,8 +167,7 @@ export function AddTransaksiDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px]">
+    <DialogWrapper open={isOpen} onOpenChange={handleClose} className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Tambah Transaksi Baru</DialogTitle>
         </DialogHeader>
@@ -289,7 +289,6 @@ export function AddTransaksiDialog({
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 

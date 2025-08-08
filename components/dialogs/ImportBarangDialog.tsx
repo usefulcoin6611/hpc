@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
+import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Download, Upload, FileText, AlertTriangle, CheckCircle, X } from "lucide-react"
@@ -35,19 +36,12 @@ export function ImportBarangDialog({
     // Create template data with only headers and one empty row
     const templateData = [
       {
-        'ID': '',
         'Kode Barang': '',
-        'Nama Barang': '',
-        'Kategori': '',
-        'Satuan': '',
-        'Stok': '',
-        'Stok Minimum': '',
-        'Lokasi': '',
-        'Deskripsi': ''
+        'Nama Barang': ''
       }
     ]
     
-    const headers = Object.keys(templateData[0])
+    const headers = ['Kode Barang', 'Nama Barang']
     const filename = `template_master_barang_${new Date().toISOString().split('T')[0]}`
     
     exportToCSV(templateData, headers, filename)
@@ -66,31 +60,11 @@ export function ImportBarangDialog({
     
     try {
       const headers = [
-        'ID',
         'Kode Barang',
-        'Nama Barang', 
-        'Kategori',
-        'Satuan',
-        'Stok',
-        'Stok Minimum',
-        'Lokasi',
-        'Deskripsi'
+        'Nama Barang'
       ]
       
       const validationRules = [
-        {
-          field: 'ID',
-          required: true,
-          validator: (value: string) => {
-            if (!value || value.trim() === '') {
-              return 'ID wajib diisi'
-            }
-            if (isNaN(Number(value)) || Number(value) <= 0) {
-              return 'ID harus berupa angka positif'
-            }
-            return true
-          }
-        },
         {
           field: 'Kode Barang',
           required: true,
@@ -211,15 +185,8 @@ export function ImportBarangDialog({
     try {
       // Convert validated data to CreateBarangData format
       const importData: CreateBarangData[] = validatedData.map((row: any) => ({
-        id: parseInt((row as any)['ID']) || undefined,
         kode: (row as any)['Kode Barang']?.trim() || '',
-        nama: (row as any)['Nama Barang']?.trim() || '',
-        kategori: (row as any)['Kategori']?.trim() || null,
-        satuan: (row as any)['Satuan']?.trim() || null,
-        stok: parseInt((row as any)['Stok']) || 0,
-        stokMinimum: parseInt((row as any)['Stok Minimum']) || 0,
-        lokasi: (row as any)['Lokasi']?.trim() || null,
-        deskripsi: (row as any)['Deskripsi']?.trim() || null
+        nama: (row as any)['Nama Barang']?.trim() || ''
       }))
 
       const result = await onImport(importData)
@@ -264,12 +231,11 @@ export function ImportBarangDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+    <DialogWrapper open={isOpen} onOpenChange={handleClose} className="max-w-md">
         <DialogHeader>
           <DialogTitle>Import Data Master Barang</DialogTitle>
           <DialogDescription>
-            Upload file CSV atau Excel untuk mengimport data barang
+            Upload file CSV atau Excel untuk mengimport data barang (Kode Barang dan Nama Barang)
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -448,7 +414,6 @@ export function ImportBarangDialog({
             Tutup
           </Button>
         </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 

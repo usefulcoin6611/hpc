@@ -120,10 +120,10 @@ class QCService {
     }
   }
 
-  async deleteFoto(fotoId: number): Promise<void> {
+  async deleteFoto(fotoId: number, noSeri: string): Promise<void> {
     try {
       const token = getStoredToken()
-      const response = await fetch(`${this.baseUrl}/fotos/${fotoId}`, {
+      const response = await fetch(`${this.baseUrl}/${noSeri}/fotos?id=${fotoId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

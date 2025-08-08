@@ -8,6 +8,7 @@ export interface BarangMasukData {
   noForm: string
   status: string
   details: {
+    kodeBarang: string
     namaBarang: string
     jumlah: number
     units: {
@@ -62,6 +63,7 @@ class BarangMasukService {
         status: item.status || '',
         details: item.detailBarangMasuk.map((detail: any) => ({
           id: detail.id,
+          kodeBarang: detail.barang?.kode || '',
           namaBarang: detail.barang?.nama || '',
           jumlah: detail.jumlah,
           units: detail.noSeriList.map((unit: any, index: number) => ({

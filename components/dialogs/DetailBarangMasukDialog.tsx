@@ -3,9 +3,8 @@
 import React from "react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { DialogWrapper } from "@/components/ui/dialog-wrapper"
 import {
-  Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -173,8 +172,7 @@ export function DetailBarangMasukDialog({
   const flattenedData = generateFlattenedData()
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[768px] max-h-[90vh] overflow-y-auto modal-scrollbar">
+    <DialogWrapper open={isOpen} onOpenChange={onOpenChange} className="sm:max-w-[768px] max-h-[90vh] overflow-y-auto modal-scrollbar">
         <DialogHeader>
           <DialogTitle>Detail Barang Masuk</DialogTitle>
           <DialogDescription>Informasi lengkap mengenai transaksi barang masuk ini.</DialogDescription>
@@ -269,7 +267,6 @@ export function DetailBarangMasukDialog({
             </Button>
           </DialogClose>
         </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    </DialogWrapper>
   )
 } 
