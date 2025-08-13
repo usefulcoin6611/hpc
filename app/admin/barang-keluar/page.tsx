@@ -15,7 +15,6 @@ import { useBarangKeluar } from "@/hooks/use-barang-keluar"
 
 export default function BarangKeluarPage() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [noSeriFilter, setNoSeriFilter] = useState("")
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [showDetailDialog, setShowDetailDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
@@ -24,19 +23,11 @@ export default function BarangKeluarPage() {
 
   const handleSearch = (term: string) => {
     setSearchTerm(term)
-    const searchQuery = term || noSeriFilter
-    fetchBarangKeluar({ search: searchQuery })
+    fetchBarangKeluar({ search: term })
   }
 
-  const handleNoSeriFilter = (noSeri: string) => {
-    setNoSeriFilter(noSeri)
-    const searchQuery = searchTerm || noSeri
-    fetchBarangKeluar({ search: searchQuery })
-  }
-
-  const clearFilters = () => {
+  const clearSearch = () => {
     setSearchTerm("")
-    setNoSeriFilter("")
     fetchBarangKeluar()
   }
 
@@ -87,20 +78,13 @@ export default function BarangKeluarPage() {
           <p className="text-muted-foreground">
             Kelola data barang yang keluar dari gudang.
           </p>
-          {/* Filter Info */}
-          {(searchTerm || noSeriFilter) && (
+          {/* Search Info */}
+          {searchTerm && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span>Filter aktif:</span>
-              {searchTerm && (
-                <Badge variant="secondary" className="text-xs">
-                  Search: {searchTerm}
-                </Badge>
-              )}
-              {noSeriFilter && (
-                <Badge variant="secondary" className="text-xs">
-                  No Seri: {noSeriFilter}
-                </Badge>
-              )}
+              <span>Search aktif:</span>
+              <Badge variant="secondary" className="text-xs">
+                {searchTerm}
+              </Badge>
             </div>
           )}
         </div>
@@ -117,37 +101,26 @@ export default function BarangKeluarPage() {
             </Button>
           </div>
 
-          {/* Right side - Search and Filters */}
+          {/* Right side - Search */}
           <div className="flex flex-wrap items-center gap-3">
-            {/* No Seri Filter */}
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-600">Filter No Seri</label>
-              <Input
-                placeholder="Cari berdasarkan no seri..."
-                value={noSeriFilter}
-                onChange={(e) => handleNoSeriFilter(e.target.value)}
-                className="w-full rounded-lg border-gray-200 bg-white pl-3 py-2 text-sm focus:border-primary focus:ring-primary sm:w-48"
-              />
-            </div>
-            
-            {/* General Search */}
+            {/* Search */}
             <OptimizedSearch
-              placeholder="Cari barang keluar..."
+              placeholder="no Delivery, no seri, tujuan"
               onSearch={handleSearch}
               className="max-w-md"
               variant="modern"
               size="md"
             />
             
-            {/* Clear Filters Button */}
-            {(searchTerm || noSeriFilter) && (
+            {/* Clear Search Button */}
+            {searchTerm && (
               <Button
                 variant="outline"
                 size="sm"
-                onClick={clearFilters}
+                onClick={clearSearch}
                 className="mt-6 sm:mt-0 h-8 px-3 text-xs"
               >
-                Clear Filters
+                Clear Search
               </Button>
             )}
           </div>
