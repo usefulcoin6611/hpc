@@ -15,6 +15,7 @@ import { useBarangKeluar } from "@/hooks/use-barang-keluar"
 
 export default function BarangKeluarPage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [noSeriFilter, setNoSeriFilter] = useState("")
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [showDetailDialog, setShowDetailDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
@@ -23,7 +24,20 @@ export default function BarangKeluarPage() {
 
   const handleSearch = (term: string) => {
     setSearchTerm(term)
-    fetchBarangKeluar({ search: term })
+    const searchQuery = term || noSeriFilter
+    fetchBarangKeluar({ search: searchQuery })
+  }
+
+  const handleNoSeriFilter = (noSeri: string) => {
+    setNoSeriFilter(noSeri)
+    const searchQuery = searchTerm || noSeri
+    fetchBarangKeluar({ search: searchQuery })
+  }
+
+  const clearFilters = () => {
+    setSearchTerm("")
+    setNoSeriFilter("")
+    fetchBarangKeluar()
   }
 
   const handleDetailClick = (id: number) => {
@@ -73,6 +87,22 @@ export default function BarangKeluarPage() {
           <p className="text-muted-foreground">
             Kelola data barang yang keluar dari gudang.
           </p>
+          {/* Filter Info */}
+          {(searchTerm || noSeriFilter) && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span>Filter aktif:</span>
+              {searchTerm && (
+                <Badge variant="secondary" className="text-xs">
+                  Search: {searchTerm}
+                </Badge>
+              )}
+              {noSeriFilter && (
+                <Badge variant="secondary" className="text-xs">
+                  No Seri: {noSeriFilter}
+                </Badge>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -87,8 +117,20 @@ export default function BarangKeluarPage() {
             </Button>
           </div>
 
-          {/* Right side - Search */}
+          {/* Right side - Search and Filters */}
           <div className="flex flex-wrap items-center gap-3">
+            {/* No Seri Filter */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-gray-600">Filter No Seri</label>
+              <Input
+                placeholder="Cari berdasarkan no seri..."
+                value={noSeriFilter}
+                onChange={(e) => handleNoSeriFilter(e.target.value)}
+                className="w-full rounded-lg border-gray-200 bg-white pl-3 py-2 text-sm focus:border-primary focus:ring-primary sm:w-48"
+              />
+            </div>
+            
+            {/* General Search */}
             <OptimizedSearch
               placeholder="Cari barang keluar..."
               onSearch={handleSearch}
@@ -96,6 +138,18 @@ export default function BarangKeluarPage() {
               variant="modern"
               size="md"
             />
+            
+            {/* Clear Filters Button */}
+            {(searchTerm || noSeriFilter) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearFilters}
+                className="mt-6 sm:mt-0 h-8 px-3 text-xs"
+              >
+                Clear Filters
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -156,6 +210,18 @@ export default function BarangKeluarPage() {
                           <p className="text-sm">{item.status === 'approved' ? 'Disetujui' : 'Pending'}</p>
                         </div>
                       </div>
+                      {item.noSeriList && item.noSeriList.length > 0 && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">No Seri</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {item.noSeriList.map((noSeri: string, idx: number) => (
+                              <span key={idx} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {noSeri}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="mt-4 flex gap-2">
                       <Button 
@@ -190,12 +256,13 @@ export default function BarangKeluarPage() {
                     <TableHead className="py-3 font-medium text-gray-600">Delivery No</TableHead>
                     <TableHead className="py-3 font-medium text-gray-600">Tanggal</TableHead>
                     <TableHead className="py-3 font-medium text-gray-600">Ship to</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">No Seri</TableHead>
                     <TableHead className="rounded-tr-xl py-3 text-center font-medium text-gray-600">Pengaturan</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8">
+                    <TableCell colSpan={6} className="text-center py-8">
                       <div className="flex items-center justify-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                         <span className="ml-2 text-gray-600">Memuat data...</span>
@@ -214,12 +281,13 @@ export default function BarangKeluarPage() {
                     <TableHead className="py-3 font-medium text-gray-600">Delivery No</TableHead>
                     <TableHead className="py-3 font-medium text-gray-600">Tanggal</TableHead>
                     <TableHead className="py-3 font-medium text-gray-600">Ship to</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">No Seri</TableHead>
                     <TableHead className="rounded-tr-xl py-3 text-center font-medium text-gray-600">Pengaturan</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-12">
+                    <TableCell colSpan={6} className="text-center py-12">
                       <div className="flex flex-col items-center">
                         <Package className="h-16 w-16 text-gray-400 mb-4" />
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum ada data barang keluar</h3>
@@ -236,50 +304,64 @@ export default function BarangKeluarPage() {
             <div className="h-full rounded-xl border border-gray-100 bg-white shadow-soft">
               <div className="h-full overflow-y-auto">
                 <Table>
-                  <TableHeader className="sticky top-0 bg-white z-10">
-                    <TableRow className="bg-sky-100">
-                      <TableHead className="w-12 rounded-tl-xl py-3 text-center font-medium text-gray-600">No</TableHead>
-                      <TableHead className="py-3 font-medium text-gray-600">Delivery No</TableHead>
-                      <TableHead className="py-3 font-medium text-gray-600">Tanggal</TableHead>
-                      <TableHead className="py-3 font-medium text-gray-600">Ship to</TableHead>
-                      <TableHead className="rounded-tr-xl py-3 text-center font-medium text-gray-600">Pengaturan</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {barangKeluar.map((item, index) => (
-                      <TableRow key={item.id} className="border-t border-gray-100 hover:bg-gray-50">
-                        <TableCell className="text-center font-medium text-gray-600">
-                          {index + 1}
-                        </TableCell>
-                        <TableCell className="font-medium text-gray-800">
-                          {item.deliveryNo || '-'}
-                        </TableCell>
-                        <TableCell className="font-medium text-gray-800">
-                          {new Date(item.tanggal).toLocaleDateString('id-ID')}
-                        </TableCell>
-                        <TableCell className="text-gray-800">
-                          {item.tujuan || '-'}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex justify-center gap-2">
-                            <Button 
-                              className="h-8 rounded-lg bg-gray-500 px-3 text-xs font-medium text-white hover:bg-gray-600"
-                              onClick={() => handleDetailClick(item.id)}
-                            >
-                              <Eye className="mr-1 h-3 w-3" />
-                              Detail
-                            </Button>
-                            <Button 
-                              className="h-8 rounded-lg bg-amber-400 px-3 text-xs font-medium text-white hover:bg-amber-500"
-                              onClick={() => handleEditClick(item.id)}
-                            >
-                              <Edit className="mr-1 h-3 w-3" />
-                              Edit
-                            </Button>
+                                  <TableHeader className="sticky top-0 bg-white z-10">
+                  <TableRow className="bg-sky-100">
+                    <TableHead className="w-12 rounded-tl-xl py-3 text-center font-medium text-gray-600">No</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">Delivery No</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">Tanggal</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">Ship to</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">No Seri</TableHead>
+                    <TableHead className="rounded-tr-xl py-3 text-center font-medium text-gray-600">Pengaturan</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {barangKeluar.map((item, index) => (
+                    <TableRow key={item.id} className="border-t border-gray-100 hover:bg-gray-50">
+                      <TableCell className="text-center font-medium text-gray-600">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-800">
+                        {item.deliveryNo || '-'}
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-800">
+                        {new Date(item.tanggal).toLocaleDateString('id-ID')}
+                      </TableCell>
+                      <TableCell className="text-gray-800">
+                        {item.tujuan || '-'}
+                      </TableCell>
+                      <TableCell className="text-gray-800">
+                        {item.noSeriList && item.noSeriList.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {item.noSeriList.map((noSeri: string, idx: number) => (
+                              <span key={idx} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {noSeri}
+                              </span>
+                            ))}
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-center gap-2">
+                          <Button 
+                            className="h-8 rounded-lg bg-gray-500 px-3 text-xs font-medium text-white hover:bg-gray-600"
+                            onClick={() => handleDetailClick(item.id)}
+                          >
+                            <Eye className="mr-1 h-3 w-3" />
+                            Detail
+                          </Button>
+                          <Button 
+                            className="h-8 rounded-lg bg-amber-400 px-3 text-xs font-medium text-white hover:bg-amber-500"
+                            onClick={() => handleEditClick(item.id)}
+                          >
+                            <Edit className="mr-1 h-3 w-3" />
+                            Edit
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                   </TableBody>
                 </Table>
               </div>

@@ -40,6 +40,7 @@ export interface BarangKeluarListItem {
   keterangan?: string
   status: string
   totalItems: number
+  noSeriList?: string[]
   createdBy: {
     id: number
     name: string

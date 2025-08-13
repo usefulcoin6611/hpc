@@ -25,6 +25,7 @@ export default function UpdateLembarKerjaPage() {
   const [selectedNoSeri, setSelectedNoSeri] = useState<string>("")
   const [searchTerm, setSearchTerm] = useState("")
   const [loadedDialogData, setLoadedDialogData] = useState<any>(null)
+  const [isDetailView, setIsDetailView] = useState(false) // Add state for detail view mode
   
   // Filter states
   const [namaBarangFilter, setNamaBarangFilter] = useState<string>("")
@@ -67,6 +68,51 @@ export default function UpdateLembarKerjaPage() {
     }
   }
 
+  // Function to handle detail click - view data without editing
+  const handleDetailClick = async (item: any) => {
+    const noForm = item.versi
+    const noSeri = extractNoSeriFromVersi(item.versi)
+    const jenisPekerjaan = item.jenisPekerjaan
+    
+    setSelectedData(item)
+    setSelectedNoSeri(noSeri)
+    setIsDetailView(true) // Set detail view mode
+    
+    try {
+      // Load existing data for this specific noForm
+      const lembarKerjaData = await fetchLembarKerjaByNoForm(noForm)
+      console.log('Loaded lembar kerja data for detail view:', lembarKerjaData)
+      
+      // Store loaded data for dialog
+      setLoadedDialogData(lembarKerjaData)
+      
+      // Open appropriate dialog based on jenis pekerjaan
+      if (jenisPekerjaan === "Inspeksi Mesin" || jenisPekerjaan === "inspeksi_mesin") {
+        setEditInspeksiOpen(true)
+      } 
+      else if (jenisPekerjaan === "Assembly" || jenisPekerjaan === "assembly_staff") {
+        setEditAssemblyOpen(true)
+      }
+      else if (jenisPekerjaan === "Painting" || jenisPekerjaan === "painting_staff") {
+        setEditPaintingOpen(true)
+      }
+      else if (jenisPekerjaan === "QC" || jenisPekerjaan === "qc_staff") {
+        setEditQCOpen(true)
+      }
+      else if (jenisPekerjaan === "PDI" || jenisPekerjaan === "pdi_staff") {
+        setEditPDIOpen(true)
+      }
+      else if (jenisPekerjaan === "Pindah Lokasi" || jenisPekerjaan === "pindah_lokasi") {
+        setEditPindahLokasiOpen(true)
+      }
+      else {
+        console.error('Unknown job type:', jenisPekerjaan)
+      }
+    } catch (error) {
+      console.error('Error loading data for detail view:', error)
+    }
+  }
+
   // Function to handle update click - edit specific noForm
   const handleUpdateClick = async (item: any) => {
     const noForm = item.versi
@@ -75,6 +121,7 @@ export default function UpdateLembarKerjaPage() {
     
     setSelectedData(item)
     setSelectedNoSeri(noSeri)
+    setIsDetailView(false) // Set edit mode (not detail view)
     
     // Add item to updating set
     setUpdatingItems(prev => new Set(prev).add(item.id))
@@ -175,6 +222,7 @@ export default function UpdateLembarKerjaPage() {
       setLoadedDialogData(null)
       setSelectedData(null)
       setSelectedNoSeri("")
+      setIsDetailView(false) // Reset detail view mode
       
       // Refresh the lembar kerja data
       fetchLembarKerja()
@@ -317,7 +365,10 @@ export default function UpdateLembarKerjaPage() {
               </div>
             </div>
             <div className="mt-4 flex gap-2">
-              <Button className="flex-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-dark">
+              <Button 
+                className="flex-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-dark"
+                onClick={() => handleDetailClick(item)}
+              >
                 <Eye className="mr-1 h-3 w-3" />
                 Detail
               </Button>
@@ -380,7 +431,10 @@ export default function UpdateLembarKerjaPage() {
                   <TableCell className="text-gray-800">{item.catatanPembaruan}</TableCell>
                   <TableCell>
                     <div className="flex justify-center gap-2">
-                      <Button className="h-8 rounded-lg bg-primary px-3 text-xs font-medium text-white hover:bg-primary-dark">
+                      <Button 
+                        className="h-8 rounded-lg bg-primary px-3 text-xs font-medium text-white hover:bg-primary-dark"
+                        onClick={() => handleDetailClick(item)}
+                      >
                         <Eye className="mr-1 h-3 w-3" />
                         Detail
                       </Button>
@@ -414,11 +468,14 @@ export default function UpdateLembarKerjaPage() {
           setLoadedDialogData(null)
           setSelectedData(null)
           setSelectedNoSeri("")
+          setIsDetailView(false) // Reset detail view mode
         }}
         onSubmit={handleDialogSubmit}
         noSeri={selectedNoSeri}
         namaBarang={selectedData?.tipeMesin || ''}
         currentItems={loadedDialogData?.items || []}
+        isDetailView={isDetailView}
+        currentKeterangan={loadedDialogData?.keterangan || ''}
       />
 
       <EditInspeksiDialog
@@ -428,11 +485,14 @@ export default function UpdateLembarKerjaPage() {
           setLoadedDialogData(null)
           setSelectedData(null)
           setSelectedNoSeri("")
+          setIsDetailView(false) // Reset detail view mode
         }}
         onSubmit={handleDialogSubmit}
+        isDetailView={isDetailView}
         noSeri={selectedNoSeri}
         namaBarang={selectedData?.tipeMesin || ''}
         currentItems={loadedDialogData?.items || []}
+        currentKeterangan={loadedDialogData?.keterangan || ''}
       />
 
       <EditPindahLokasiDialog
@@ -442,10 +502,12 @@ export default function UpdateLembarKerjaPage() {
           setLoadedDialogData(null)
           setSelectedData(null)
           setSelectedNoSeri("")
+          setIsDetailView(false) // Reset detail view mode
         }}
         onSubmit={handleDialogSubmit}
         noSeri={selectedNoSeri}
         namaBarang={selectedData?.tipeMesin || ''}
+        isDetailView={isDetailView}
       />
 
       <EditPaintingDialog
@@ -455,11 +517,14 @@ export default function UpdateLembarKerjaPage() {
           setLoadedDialogData(null)
           setSelectedData(null)
           setSelectedNoSeri("")
+          setIsDetailView(false) // Reset detail view mode
         }}
         onSubmit={handleDialogSubmit}
         noSeri={selectedNoSeri}
         namaBarang={selectedData?.tipeMesin || ''}
         currentItems={loadedDialogData?.items || []}
+        isDetailView={isDetailView}
+        currentKeterangan={loadedDialogData?.keterangan || ''}
       />
 
       <EditQCDialog
@@ -469,11 +534,14 @@ export default function UpdateLembarKerjaPage() {
           setLoadedDialogData(null)
           setSelectedData(null)
           setSelectedNoSeri("")
+          setIsDetailView(false) // Reset detail view mode
         }}
         onSubmit={handleDialogSubmit}
         noSeri={selectedNoSeri}
         namaBarang={selectedData?.tipeMesin || ''}
         currentItems={loadedDialogData?.items || []}
+        isDetailView={isDetailView}
+        currentKeterangan={loadedDialogData?.keterangan || ''}
       />
 
       <EditAssemblyDialog
@@ -483,11 +551,14 @@ export default function UpdateLembarKerjaPage() {
           setLoadedDialogData(null)
           setSelectedData(null)
           setSelectedNoSeri("")
+          setIsDetailView(false) // Reset detail view mode
         }}
         onSubmit={handleDialogSubmit}
         noSeri={selectedNoSeri}
         namaBarang={selectedData?.tipeMesin || ''}
         currentItems={loadedDialogData?.items || []}
+        isDetailView={isDetailView}
+        currentKeterangan={loadedDialogData?.keterangan || ''}
       />
 
     </div>

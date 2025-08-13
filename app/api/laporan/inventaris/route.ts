@@ -127,10 +127,30 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        // Get total qty from detailBarangMasukNoSeri
-        const totalQty = await prisma.detailBarangMasukNoSeri.count({
+        // Get total qty from detailBarangMasukNoSeri (excluding barang keluar)
+        // Total Qty = Barang Masuk - Barang Keluar
+        const totalBarangMasuk = await prisma.detailBarangMasukNoSeri.count({
           where: noSeriWhereClause
         })
+
+        // Hitung barang yang sudah keluar untuk barang ini
+        const totalBarangKeluar = await prisma.barangKeluar.count({
+          where: {
+            detailBarangKeluar: {
+              some: {
+                detailBarangMasukNoSeri: {
+                  detailBarangMasuk: {
+                    barangId: barang.id
+                  }
+                }
+              }
+            },
+            isActive: true
+          }
+        })
+
+        // Total Qty = Barang Masuk - Barang Keluar
+        const totalQty = totalBarangMasuk - totalBarangKeluar
 
         // Get qty ready (no seri yang QC approved dan belum keluar)
         // Ambil semua no seri untuk barang ini

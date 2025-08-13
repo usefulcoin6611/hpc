@@ -42,7 +42,16 @@ export async function GET(request: NextRequest) {
         OR: [
           { noTransaksi: { contains: search } },
           { tujuan: { contains: search } },
-          { keterangan: { contains: search } }
+          { keterangan: { contains: search } },
+          {
+            detailBarangKeluar: {
+              some: {
+                detailBarangMasukNoSeri: {
+                  noSeri: { contains: search }
+                }
+              }
+            }
+          }
         ]
       }),
       ...(status && { status })
@@ -76,6 +85,12 @@ export async function GET(request: NextRequest) {
                   nama: true,
                   satuan: true
                 }
+              },
+              detailBarangMasukNoSeri: {
+                select: {
+                  id: true,
+                  noSeri: true
+                }
               }
             }
           }
@@ -97,6 +112,10 @@ export async function GET(request: NextRequest) {
       keterangan: item.keterangan,
       status: item.status,
       totalItems: item.detailBarangKeluar.reduce((sum, detail) => sum + detail.jumlah, 0),
+      noSeriList: item.detailBarangKeluar
+        .filter(detail => detail.detailBarangMasukNoSeri)
+        .map(detail => detail.detailBarangMasukNoSeri?.noSeri)
+        .filter(Boolean),
       createdBy: item.createdBy,
       approvedBy: item.approvedBy,
       createdAt: item.createdAt,
