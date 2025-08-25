@@ -49,9 +49,14 @@ class BarangMasukService {
     return response.json()
   }
 
-  async fetchAll(): Promise<IncomingItemWithDetails[]> {
+  async fetchAll(search?: string, page: number = 1, limit: number = 10): Promise<{ data: IncomingItemWithDetails[], pagination: any }> {
     try {
-      const result = await this.makeRequest('')
+      const params = new URLSearchParams()
+      if (search) params.set('search', search)
+      if (page) params.set('page', String(page))
+      if (limit) params.set('limit', String(limit))
+      const query = params.toString() ? `?${params.toString()}` : ''
+      const result = await this.makeRequest(query)
       
       // Transform API data to match our frontend structure
       const transformedData: IncomingItemWithDetails[] = result.data.map((item: any) => ({
@@ -77,7 +82,7 @@ class BarangMasukService {
         }))
       }))
 
-      return transformedData
+      return { data: transformedData, pagination: result.pagination }
     } catch (error) {
       console.error('Error fetching barang masuk:', error)
       throw error

@@ -50,7 +50,7 @@ export function DetailBarangMasukDialog({
           flattenedData.push({
             rowNumber,
             tanggal: selectedItem.tanggal,
-            kodeBarang: '-', // Placeholder since kodeBarang is not in the type
+            kodeBarang: detail.kodeBarang || '-',
             namaBarang: detail.namaBarang,
             qty: 1,
             noSeri: unit.noSeri || '-',
@@ -64,7 +64,7 @@ export function DetailBarangMasukDialog({
         flattenedData.push({
           rowNumber,
           tanggal: selectedItem.tanggal,
-          kodeBarang: '-', // Placeholder since kodeBarang is not in the type
+          kodeBarang: detail.kodeBarang || '-',
           namaBarang: detail.namaBarang,
           qty: detail.jumlah,
           noSeri: '-',

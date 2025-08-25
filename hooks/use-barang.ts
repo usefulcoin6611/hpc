@@ -10,14 +10,18 @@ export function useBarang() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [page, setPage] = useState<number>(1)
+  const [limit, setLimit] = useState<number>(10)
 
   // Fetch data function
-  const fetchData = useCallback(async (search?: string) => {
+  const fetchData = useCallback(async (search?: string, pageArg?: number, limitArg?: number) => {
     setLoading(true)
     setError(null)
     
     try {
-      const result = await barangService.getBarang(search)
+      const effectivePage = pageArg ?? page
+      const effectiveLimit = limitArg ?? limit
+      const result = await barangService.getBarang(search, effectivePage, effectiveLimit)
       setData(result)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Terjadi kesalahan'
@@ -31,17 +35,17 @@ export function useBarang() {
     } finally {
       setLoading(false)
     }
-  }, [toast])
+  }, [toast, page, limit])
 
   // Refetch function for retry
   const refetch = useCallback(() => {
-    fetchData(searchTerm)
-  }, [fetchData, searchTerm])
+    fetchData(searchTerm, page, limit)
+  }, [fetchData, searchTerm, page, limit])
 
   // Load data on component mount
   useEffect(() => {
-    fetchData(searchTerm)
-  }, [fetchData, searchTerm])
+    fetchData(searchTerm, page, limit)
+  }, [fetchData, searchTerm, page, limit])
 
   // CRUD Operations
   const createBarang = useCallback(async (data: CreateBarangData) => {
@@ -187,12 +191,16 @@ export function useBarang() {
     loading,
     error,
     searchTerm,
+    page,
+    limit,
     items,
     filteredItems,
     sortedFilteredItems,
     
     // Actions
     setSearchTerm,
+    setPage,
+    setLimit,
     fetchData,
     refetch,
     createBarang,

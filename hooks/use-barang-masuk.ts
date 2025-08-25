@@ -5,7 +5,10 @@ import { barangMasukService, BarangMasukData } from "@/services/barang-masuk"
 
 export function useBarangMasuk() {
   const [incomingItems, setIncomingItems] = useState<IncomingItemWithDetails[]>([])
+  const [pagination, setPagination] = useState<{ page: number; limit: number; total: number; totalPages: number } | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [page, setPage] = useState<number>(1)
+  const [limit, setLimit] = useState<number>(10)
   const [isExporting, setIsExporting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
@@ -20,8 +23,9 @@ export function useBarangMasuk() {
   const fetchBarangMasuk = async () => {
     try {
       setIsLoading(true)
-      const data = await barangMasukService.fetchAll()
-      setIncomingItems(data)
+      const result = await barangMasukService.fetchAll(searchTerm, page, limit)
+      setIncomingItems(result.data)
+      setPagination(result.pagination)
     } catch (error) {
       console.error('Error fetching data:', error)
       toast({
@@ -234,12 +238,15 @@ export function useBarangMasuk() {
   // Load data on mount
   useEffect(() => {
     fetchBarangMasuk()
-  }, [])
+  }, [searchTerm, page, limit])
 
   return {
     // State
     incomingItems,
+    pagination,
     searchTerm,
+    page,
+    limit,
     isExporting,
     isImporting,
     isDetailDialogOpen,
@@ -251,6 +258,8 @@ export function useBarangMasuk() {
 
     // Setters
     setSearchTerm,
+    setPage,
+    setLimit,
     setIsDetailDialogOpen,
     setIsEditDialogOpen,
     setIsAddDialogOpen,

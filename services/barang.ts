@@ -64,9 +64,13 @@ class BarangService {
     return result
   }
 
-  async getBarang(search?: string): Promise<{ data: Barang[], pagination: any }> {
+  async getBarang(search?: string, page: number = 1, limit: number = 10): Promise<{ data: Barang[], pagination: any }> {
     try {
-      const searchParams = search ? `?search=${encodeURIComponent(search)}` : ''
+      const params = new URLSearchParams()
+      if (search) params.set('search', search)
+      if (page) params.set('page', String(page))
+      if (limit) params.set('limit', String(limit))
+      const searchParams = params.toString() ? `?${params.toString()}` : ''
       const result = await this.makeRequest(searchParams)
       return result
     } catch (error) {

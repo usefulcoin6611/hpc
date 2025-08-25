@@ -6,6 +6,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Download, Plus, Search, Upload, AlertTriangle, Package } from "lucide-react"
 import { OptimizedSearch } from "@/components/ui/optimized-search"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ChevronsLeft, ChevronsRight } from "lucide-react"
 import { useBarang } from "@/hooks/use-barang"
 import { AddBarangDialog } from "@/components/dialogs/AddBarangDialog"
 import { EditBarangDialog } from "@/components/dialogs/EditBarangDialog"
@@ -28,7 +31,17 @@ export default function MasterBarangPage() {
     updateBarang,
     deleteBarang,
     importBarang,
+    page,
+    limit,
+    setPage,
+    setLimit,
   } = useBarang()
+
+  const total = data?.pagination?.total || 0
+  const totalPages = data?.pagination?.totalPages || 1
+  const currentLimit = data?.pagination?.limit || limit || 10
+  const startIndex = total > 0 ? (page - 1) * currentLimit + 1 : 0
+  const endIndex = Math.min(page * currentLimit, total)
 
   // Dialog states
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -239,7 +252,7 @@ export default function MasterBarangPage() {
               ) : (
                 sortedFilteredItems.map((item, index) => (
                   <TableRow key={item.id} className="border-t border-gray-100 hover:bg-gray-50">
-                    <TableCell className="text-center font-medium text-gray-600">{index + 1}</TableCell>
+                    <TableCell className="text-center font-medium text-gray-600">{(page - 1) * (data?.pagination?.limit || 10) + index + 1}</TableCell>
                     <TableCell className="font-medium text-gray-800">{item.kode}</TableCell>
                     <TableCell className="text-gray-800">{item.nama}</TableCell>
                     <TableCell className="text-center">
@@ -265,6 +278,109 @@ export default function MasterBarangPage() {
           </Table>
         </div>
       </div>
+
+      {/* Pagination Controls - Redesigned */}
+      {data?.pagination && (
+        <div className="mt-4 w-full flex items-center justify-center gap-3 overflow-x-auto whitespace-nowrap px-2">
+          {/* Info jumlah data */}
+        
+
+          {/* Page size + controls */}
+          <div className="flex flex-nowrap items-center justify-center gap-2">
+            {/* Page size selector */}
+            <div className="flex items-center gap-2 text-xs">
+              
+              <Select
+                value={String(currentLimit)}
+                onValueChange={(val) => {
+                  const newLimit = parseInt(val)
+                  // Reset ke halaman 1 saat limit berubah
+                  setPage(1)
+                  setLimit(newLimit)
+                }}
+              >
+                
+                <SelectTrigger className="h-8 w-[80px]">
+                  <SelectValue placeholder={String(currentLimit)} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <span className="text-gray-600">baris</span>
+            </div>
+
+            {/* Pager */}
+            <Pagination className="mx-0">
+              <PaginationContent>
+                {/* First */}
+                <PaginationItem>
+                  <PaginationLink
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      if (page > 1) setPage(1)
+                    }}
+                    className={(page === 1 ? "pointer-events-none opacity-50 " : "") + "h-8 px-2"}
+                  >
+                    <ChevronsLeft className="h-4 w-4" />
+                  </PaginationLink>
+                </PaginationItem>
+
+                {/* Prev */}
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      if (data.pagination.hasPrev) setPage(page - 1)
+                    }}
+                    className={( !data.pagination.hasPrev ? "pointer-events-none opacity-50 " : "") + "h-8"}
+                  />
+                </PaginationItem>
+
+                {/* Current page indicator (simple) */}
+                <PaginationItem>
+                  <span className="px-2 text-xs text-gray-700">
+                    Halaman <span className="font-medium">{page}</span> dari <span className="font-medium">{totalPages}</span>
+                  </span>
+                </PaginationItem>
+
+                {/* Next */}
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      if (data.pagination.hasNext) setPage(page + 1)
+                    }}
+                    className={( !data.pagination.hasNext ? "pointer-events-none opacity-50 " : "") + "h-8"}
+                  />
+                </PaginationItem>
+
+                {/* Last */}
+                <PaginationItem>
+                  <PaginationLink
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      if (page < totalPages) setPage(totalPages)
+                    }}
+                    className={(page === totalPages ? "pointer-events-none opacity-50 " : "") + "h-8 px-2"}
+                  >
+                    <ChevronsRight className="h-4 w-4" />
+                  </PaginationLink>
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </div>
+      )}
 
       {/* Dialogs */}
       <AddBarangDialog

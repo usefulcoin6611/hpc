@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { ChevronsLeft, ChevronsRight } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -48,6 +50,8 @@ export default function LaporanPage() {
   const [selectedItemCode, setSelectedItemCode] = useState("")
   const [selectedPeriod, setSelectedPeriod] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
+  const [page, setPage] = useState<number>(1)
+  const [limit, setLimit] = useState<number>(10)
   
   // Hook untuk data inventaris
   const { inventoryData, loading, fetchInventoryReport } = useLaporanInventaris()
@@ -61,6 +65,14 @@ export default function LaporanPage() {
       item.namaBarang.toLowerCase().includes(searchLower)
     )
   })
+
+  // Pagination for preview table
+  const total = filteredData.length
+  const totalPages = Math.max(1, Math.ceil(total / limit))
+  const currentPage = Math.min(page, totalPages)
+  const startIndex = total > 0 ? (currentPage - 1) * limit + 1 : 0
+  const endIndex = Math.min(currentPage * limit, total)
+  const pageItems = filteredData.slice((currentPage - 1) * limit, (currentPage - 1) * limit + limit)
 
   // Auto-fetch data on page load
   useEffect(() => {
@@ -278,9 +290,9 @@ export default function LaporanPage() {
                               </TableCell>
                             </TableRow>
                           ) : (
-                            filteredData.map((item, index) => (
+                            pageItems.map((item, index) => (
                               <TableRow key={item.id} className="border-t border-gray-100 hover:bg-gray-50">
-                                <TableCell className="text-center font-medium text-gray-600">{index + 1}</TableCell>
+                                <TableCell className="text-center font-medium text-gray-600">{(currentPage - 1) * limit + index + 1}</TableCell>
                                 <TableCell className="text-gray-800">{item.kodeBarang}</TableCell>
                                 <TableCell className="text-gray-800">{item.namaBarang}</TableCell>
                                 <TableCell className="text-center text-gray-800">{item.totalQty}</TableCell>
@@ -292,6 +304,103 @@ export default function LaporanPage() {
                         </TableBody>
                       </Table>
                     </div>
+
+                    {/* Pagination Controls - Center & Compact */}
+                    {total > 0 && (
+                      <div className="mt-4 w-full flex items-center justify-center gap-3 overflow-x-auto whitespace-nowrap px-2">
+                        {/* Info jumlah data */}
+                        <div className="inline-flex items-center text-xs text-gray-600 text-center">
+                          Menampilkan <span className="mx-1 font-medium">{startIndex}</span>–<span className="mx-1 font-medium">{endIndex}</span> dari <span className="ml-1 font-medium">{total}</span> data
+                        </div>
+
+                        {/* Page size selector */}
+                        <div className="flex items-center justify-center gap-2 text-xs">
+                          <Select
+                            value={String(limit)}
+                            onValueChange={(val) => {
+                              const newLimit = parseInt(val)
+                              setPage(1)
+                              setLimit(newLimit)
+                            }}
+                          >
+                            <SelectTrigger className="h-8 w-[80px]">
+                              <SelectValue placeholder={String(limit)} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="20">20</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
+                              <SelectItem value="100">100</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span className="text-gray-600">baris</span>
+                        </div>
+
+                        {/* Pager */}
+                        <Pagination className="mx-0">
+                          <PaginationContent>
+                            {/* First */}
+                            <PaginationItem>
+                              <PaginationLink
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  if (currentPage > 1) setPage(1)
+                                }}
+                                className={(currentPage === 1 ? "pointer-events-none opacity-50 " : "") + "h-8 px-2"}
+                              >
+                                <ChevronsLeft className="h-4 w-4" />
+                              </PaginationLink>
+                            </PaginationItem>
+
+                            {/* Prev */}
+                            <PaginationItem>
+                              <PaginationPrevious
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  if (currentPage > 1) setPage(currentPage - 1)
+                                }}
+                                className={(currentPage === 1 ? "pointer-events-none opacity-50 " : "") + "h-8"}
+                              />
+                            </PaginationItem>
+
+                            {/* Indicator */}
+                            <PaginationItem>
+                              <span className="px-2 text-xs text-gray-700">
+                                Halaman <span className="font-medium">{currentPage}</span> dari <span className="font-medium">{totalPages}</span>
+                              </span>
+                            </PaginationItem>
+
+                            {/* Next */}
+                            <PaginationItem>
+                              <PaginationNext
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  if (currentPage < totalPages) setPage(currentPage + 1)
+                                }}
+                                className={(currentPage >= totalPages ? "pointer-events-none opacity-50 " : "") + "h-8"}
+                              />
+                            </PaginationItem>
+
+                            {/* Last */}
+                            <PaginationItem>
+                              <PaginationLink
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  if (currentPage < totalPages) setPage(totalPages)
+                                }}
+                                className={(currentPage >= totalPages ? "pointer-events-none opacity-50 " : "") + "h-8 px-2"}
+                              >
+                                <ChevronsRight className="h-4 w-4" />
+                              </PaginationLink>
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
+                      </div>
+                    )}
 
                     {/* Mobile card view */}
                     <div className="grid gap-4 lg:hidden">
