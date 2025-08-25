@@ -233,7 +233,7 @@ export default function BarangMasukPage() {
     <div className="space-y-6 pb-8 pt-4 lg:pt-0 animate-fadeIn">
       <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
         <h1 className="text-xl font-bold text-gray-800 sm:text-2xl">Barang Masuk</h1>
-        <div className="text-sm text-gray-500">Total: {filteredItems.length} transaksi</div>
+        {/* <div className="text-sm text-gray-500">Total: {filteredItems.length} transaksi</div> */}
       </div>
 
       <div className="h-px w-full bg-gray-200" />
